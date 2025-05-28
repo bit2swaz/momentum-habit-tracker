@@ -11,5 +11,24 @@
         <h1 class="app-title">Momentum: The Minimalist Habit Tracker</h1>
         <p class="app-description">Build momentum with consistent habit tracking, one day at a time.</p>
     </header>
+
+    <main class="container">
+        <section class="habit-input-section">
+            <input type="text" id="newHabitInput" placeholder="Add a new habit...">
+            <div class="duration-controls">
+                <label for="habitDuration">Track Until:</label>
+                <select id="habitDuration">
+                    <option value="forever">Forever</option>
+                    <option value="1week">1 Week</option>
+                    <option value="1month">1 Month</option>
+                    <option value="custom">Custom Date</option>
+                </select>
+                <input type="date" id="customEndDate" style="display: none;">
+            </div>
+            <button id="addHabitBtn">Add Habit</button>
+        </section>
+
+        
+    </main>
 </body>
 </html>
