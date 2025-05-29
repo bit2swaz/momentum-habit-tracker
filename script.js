@@ -35,12 +35,12 @@ function renderDates() {
 
     const dayOfWeek = currentWeekStart.getDay();
     const diff = currentWeekStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-    const weekStart = new Date(currentWeekStart.setDate(diff));
+    const weekStart = new Date(currentWeekStart);
+    weekStart.setDate(diff);
     weekStart.setHours(0, 0, 0, 0);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
         const date = new Date(weekStart);
@@ -51,6 +51,8 @@ function renderDates() {
     weekDates.forEach(date => {
         const dateColumn = document.createElement('div');
         dateColumn.classList.add('date-column');
+
+        dateColumn.dataset.fullDate = formatDate(date);
 
         const options = { weekday: 'short', month: 'short', day: 'numeric' };
         dateColumn.textContent = date.toLocaleDateString('en-US', options);
@@ -65,7 +67,23 @@ function renderDates() {
 
 function renderHabits() {
     const habitList = document.getElementById('habitList');
-    habitList.innerHTML='';
+    habitList.innerHTML = '';
+
+    const currentWeekFormattedDates = [];
+    const dayOfWeek = currentWeekStart.getDay();
+    const diff = currentWeekStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    const weekStart = new Date(currentWeekStart);
+    weekStart.setDate(diff);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + i);
+        currentWeekFormattedDates.push(formatDate(date));
+    }
 
     habits.forEach(habit => {
         const habitRow = document.createElement('div');
@@ -75,19 +93,57 @@ function renderHabits() {
         const habitNameDiv = document.createElement('div');
         habitNameDiv.classList.add('habit-name');
         habitNameDiv.textContent = habit.name;
-
-        // TODO: Add/delete icons here later
+        
+        // TODO: Add edit/delete icons here later
+        
         habitRow.appendChild(habitNameDiv);
 
-        for (let i = 0; i < 7; i++) {
-            const emptyCell = document.createElement('div');
-            emptyCell.classList.add('checkbox-cell');
-            habitRow.appendChild(emptyCell);
-        }
+        currentWeekFormattedDates.forEach(dateString => {
+            const checkboxCell = document.createElement('div');
+            checkboxCell.classList.add('checkbox-cell');
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.dataset.habitId = habit.id;
+            checkbox.dataset.date = dateString;
+
+            if (habit.completedDates[dateString]) {
+                checkbox.checked = true;
+            }
+
+            const cellDate = new Date(dateString);
+            cellDate.setHours(0, 0, 0, 0);
+
+            if (cellDate > today) {
+                checkbox.disabled = true;
+                checkboxCell.classList.add('disabled-day');
+            }
+            checkbox.addEventListener('change', (event) => {
+                const changedHabitId = event.target.dataset.habitId;
+                const changedDate = event.target.dataset.date;
+                const isChecked = event.target.checked;
+
+                const targetHabit = habits.find(h => h.id === changedHabitId);
+                if (targetHabit) {
+                    if (isChecked) {
+                        targetHabit.completedDates[changedDate] = true;
+                    } else {
+                        delete targetHabit.completedDates[changedDate];
+                    }
+                    saveHabits();
+                    console.log(`Habit '${targetHabit.name}' on ${changedDate} changed to: ${isChecked}`);
+                    // TODO: Add congratulations message here
+                }
+            });
+
+            checkboxCell.appendChild(checkbox);
+            habitRow.appendChild(checkboxCell);
+        });
 
         habitList.appendChild(habitRow);
     });
 }
+
 
 // --- DOM Element References & Initial Setup ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -119,15 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const durationType = habitDurationSelect.value;
         let durationDetails = 'forever';
-        
+
         if (durationType === 'custom') {
             const endDate = customEndDateInput.value;
             if (!endDate) {
                 // TODO: Replace with a custom modal/message box later
-                alert('Please select an end date!');
+                alert('Please select a custom end date!');
                 return;
             }
-
             durationDetails = {
                 startDate: formatDate(new Date()),
                 endDate: endDate
@@ -138,16 +193,16 @@ document.addEventListener('DOMContentLoaded', () => {
             id: Date.now().toString(),
             name: habitName,
             duration: durationDetails,
-            completeDates: {},
+            completedDates: {},
             streak: 0
         };
 
         habits.push(newHabit);
         saveHabits();
 
-        newHabitInput.value = '';
+        newHabitInput.value = ''; 
         habitDurationSelect.value = 'forever';
-        customEndDateInput.style.display = 'none';
+        customEndDateInput.style.display = 'none'; 
 
         renderHabits();
     });
