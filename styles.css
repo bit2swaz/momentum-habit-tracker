@@ -171,3 +171,22 @@ body {
     pointer-events: none;
     cursor: not-allowed;
 }
+
+.congratulations-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-size: 1.8em;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    pointer-events: none;
+}
