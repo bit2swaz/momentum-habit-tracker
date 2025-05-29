@@ -110,3 +110,38 @@ body {
 .date-column:last-child {
     border-right: none;
 }
+
+.habit-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.habit-row:last-child {
+    border-bottom: none;
+}
+
+.habit-name {
+    flex-basis: 150px;
+    min-width: 150px;
+    padding: 0 15px;
+    text-align: left;
+    border-right: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.checkbox-cell {
+    flex-basis: 100px;
+    min-width: 100px;
+    text-align: center;
+    padding: 0 5px;
+    border-right: 1px solid #eee;
+}
+
+.checkbox-cell:last-child {
+    border-right: none;
+}
+
