@@ -67,7 +67,6 @@ function renderDates() {
     });
 }
 
-// Displays a temporary congratulations message with an overlay.
 function showCongratulationMessage() {
     let messageContainer = document.getElementById('congratulationsMessage');
     let overlay = document.getElementById('overlay');
@@ -89,17 +88,14 @@ function showCongratulationMessage() {
 
     messageContainer.textContent = randomMessage;
     
-    // Show overlay and message
     overlay.style.opacity = '1';
     overlay.style.visibility = 'visible';
     messageContainer.style.opacity = '1';
     messageContainer.style.visibility = 'visible';
     messageContainer.style.transform = 'translate(-50%, -50%) scale(1)';
 
-    // Disable interactions on the rest of the page
     document.body.classList.add('disable-interactions');
 
-    // Hide message and overlay after a short delay
     setTimeout(() => {
         messageContainer.style.opacity = '0';
         messageContainer.style.transform = 'translate(-50%, -50%) scale(0.8)';
@@ -108,15 +104,12 @@ function showCongratulationMessage() {
         overlay.style.opacity = '0';
         overlay.style.visibility = 'hidden';
 
-        // Re-enable interactions after the message and overlay are fully hidden
         setTimeout(() => {
             document.body.classList.remove('disable-interactions');
-        }, 500); // Match CSS transition duration for overlay/message fade out
-    }, 1500); // Display message for 1.5 seconds
+        }, 500);
+    }, 1500);
 }
 
-// NEW FUNCTION: Displays a custom message box instead of alert().
-// Returns a Promise that resolves when the user clicks OK.
 function showCustomMessageBox(message) {
     return new Promise(resolve => {
         const messageBox = document.getElementById('customMessageBox');
@@ -126,22 +119,19 @@ function showCustomMessageBox(message) {
 
         messageBoxText.textContent = message;
         
-        // Show overlay and message box
         overlay.style.opacity = '1';
         overlay.style.visibility = 'visible';
-        messageBox.classList.add('active'); // Use class for active state
+        messageBox.classList.add('active');
         
-        // Disable interactions on the rest of the page
         document.body.classList.add('disable-interactions');
 
-        // Event listener for the close button
         const closeHandler = () => {
-            messageBox.classList.remove('active'); // Hide message box
+            messageBox.classList.remove('active');
             overlay.style.opacity = '0';
             overlay.style.visibility = 'hidden';
-            document.body.classList.remove('disable-interactions'); // Re-enable interactions
-            messageBoxCloseBtn.removeEventListener('click', closeHandler); // Clean up listener
-            resolve(); // Resolve the promise
+            document.body.classList.remove('disable-interactions');
+            messageBoxCloseBtn.removeEventListener('click', closeHandler);
+            resolve();
         };
         messageBoxCloseBtn.addEventListener('click', closeHandler);
     });
@@ -193,7 +183,13 @@ function renderHabits() {
             const cellDate = new Date(dateString);
             cellDate.setHours(0, 0, 0, 0);
 
-            if (cellDate > today) {
+            // Disable checkboxes for future dates OR dates outside the habit's duration.
+            const isFutureDate = cellDate > today;
+            const isOutsideDuration = habit.duration !== 'forever' && 
+                                      (cellDate < new Date(habit.duration.startDate).setHours(0,0,0,0) || 
+                                       cellDate > new Date(habit.duration.endDate).setHours(0,0,0,0));
+
+            if (isFutureDate || isOutsideDuration) {
                 checkbox.disabled = true;
                 checkboxCell.classList.add('disabled-day');
             }
@@ -245,25 +241,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Event listener for adding a habit.
-    addHabitBtn.addEventListener('click', async () => { // Made async to await message box
+    addHabitBtn.addEventListener('click', async () => {
         const habitName = newHabitInput.value.trim();
         if (habitName === '') {
-            await showCustomMessageBox('Please enter a habit name!'); // Replaced alert()
+            await showCustomMessageBox('Please enter a habit name!');
             return;
         }
 
         const durationType = habitDurationSelect.value;
         let durationDetails = 'forever';
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalize today for calculations
 
         if (durationType === 'custom') {
             const endDate = customEndDateInput.value;
             if (!endDate) {
-                await showCustomMessageBox('Please select a custom end date!'); // Replaced alert()
+                await showCustomMessageBox('Please select a custom end date!');
                 return;
             }
             durationDetails = {
-                startDate: formatDate(new Date()),
+                startDate: formatDate(today),
                 endDate: endDate
+            };
+        } else if (durationType === '1week') {
+            const oneWeekLater = new Date(today);
+            oneWeekLater.setDate(today.getDate() + 7); // Add 7 days
+            durationDetails = {
+                startDate: formatDate(today),
+                endDate: formatDate(oneWeekLater)
+            };
+        } else if (durationType === '1month') {
+            const oneMonthLater = new Date(today);
+            oneMonthLater.setMonth(today.getMonth() + 1); // Add 1 month
+            durationDetails = {
+                startDate: formatDate(today),
+                endDate: formatDate(oneMonthLater)
             };
         }
 
