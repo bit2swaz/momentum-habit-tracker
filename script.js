@@ -86,9 +86,12 @@ function renderDates() {
     });
 }
 
-// Displays a temporary congratulations message.
+// Displays a temporary congratulations message with an overlay.
 function showCongratulationMessage() {
     let messageContainer = document.getElementById('congratulationsMessage');
+    let overlay = document.getElementById('overlay');
+
+    // Create message container if it doesn't exist
     if (!messageContainer) {
         messageContainer = document.createElement('div');
         messageContainer.id = 'congratulationsMessage';
@@ -96,27 +99,48 @@ function showCongratulationMessage() {
         document.body.appendChild(messageContainer);
     }
 
+    // More varied and encouraging messages
     const messages = [
         "Awesome work!",
         "You're crushing it!",
         "Keep the momentum!",
         "Great job!",
         "Another one down!",
-        "Way to go!"
+        "Way to go!",
+        "You're building momentum!",
+        "Fantastic effort!",
+        "Keep up the great work!",
+        "Success!",
+        "Nailed it!"
     ];
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
 
     messageContainer.textContent = randomMessage;
-    messageContainer.style.opacity = '1'; // Make visible
-    messageContainer.style.transform = 'translate(-50%, -50%) scale(1)'; // Animate in
+    
+    // Show overlay and message
+    overlay.style.opacity = '1';
+    overlay.style.visibility = 'visible';
+    messageContainer.style.opacity = '1';
+    messageContainer.style.visibility = 'visible';
+    messageContainer.style.transform = 'translate(-50%, -50%) scale(1)';
 
-    // Hide and remove after a short delay
+    // Disable interactions on the rest of the page
+    document.body.classList.add('disable-interactions');
+
+    // Hide message and overlay after a short delay
     setTimeout(() => {
-        messageContainer.style.opacity = '0'; // Start fade out
-        messageContainer.style.transform = 'translate(-50%, -50%) scale(0.8)'; // Animate out
-        // Optional: remove element from DOM after transition, or just keep it hidden
-        // setTimeout(() => { messageContainer.remove(); }, 500); // Match CSS transition duration
-    }, 1500); // Display for 1.5 seconds
+        messageContainer.style.opacity = '0';
+        messageContainer.style.transform = 'translate(-50%, -50%) scale(0.8)';
+        messageContainer.style.visibility = 'hidden'; // Hide after transition
+
+        overlay.style.opacity = '0';
+        overlay.style.visibility = 'hidden'; // Hide after transition
+
+        // Re-enable interactions after the message and overlay are fully hidden
+        setTimeout(() => {
+            document.body.classList.remove('disable-interactions');
+        }, 500); // Match CSS transition duration for overlay/message fade out
+    }, 1500); // Display message for 1.5 seconds
 }
 
 // Renders all habits from the 'habits' array to the UI with checkboxes.
