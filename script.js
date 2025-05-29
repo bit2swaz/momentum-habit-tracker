@@ -21,9 +21,18 @@ function saveHabits() {
 
 function formatDate(date) {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+}
+
+function getMondayOfWeek(date) {
+    const d = new Date(date);
+    const dayOfWeek = d.getDay();
+    const diff = d.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    d.setDate(diff);
+    d.setHours(0, 0, 0, 0); 
+    return d; 
 }
 
 function renderDates() {
@@ -33,13 +42,9 @@ function renderDates() {
         gridHeader.removeChild(gridHeader.lastChild);
     }
 
-    const dayOfWeek = currentWeekStart.getDay();
-    const diff = currentWeekStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
     const weekStart = new Date(currentWeekStart);
-    weekStart.setDate(diff);
-    weekStart.setHours(0, 0, 0, 0);
 
-    const today = new Date(); 
+    const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const weekDates = [];
@@ -52,6 +57,7 @@ function renderDates() {
     weekDates.forEach(date => {
         const dateColumn = document.createElement('div');
         dateColumn.classList.add('date-column');
+
         dateColumn.dataset.fullDate = formatDate(date);
 
         const options = { weekday: 'short', month: 'short', day: 'numeric' };
@@ -70,12 +76,8 @@ function renderHabits() {
     habitList.innerHTML = '';
 
     const currentWeekFormattedDates = [];
-    const dayOfWeek = currentWeekStart.getDay();
-    const diff = currentWeekStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-    const weekStart = new Date(currentWeekStart);
-    weekStart.setDate(diff);
-    weekStart.setHours(0, 0, 0, 0);
-
+    const weekStart = new Date(currentWeekStart); 
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -104,15 +106,15 @@ function renderHabits() {
 
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.dataset.habitId = habit.id;
+            checkbox.dataset.habitId = habit.id; 
             checkbox.dataset.date = dateString; 
 
             if (habit.completedDates[dateString]) {
                 checkbox.checked = true;
             }
 
-            const cellDate = new Date(dateString);
-            cellDate.setHours(0, 0, 0, 0);
+            const cellDate = new Date(dateString); 
+            cellDate.setHours(0, 0, 0, 0); 
 
             if (cellDate > today) {
                 checkbox.disabled = true;
@@ -129,9 +131,9 @@ function renderHabits() {
                     if (isChecked) {
                         targetHabit.completedDates[changedDate] = true;
                     } else {
-                        delete targetHabit.completedDates[changedDate];
+                        delete targetHabit.completedDates[changedDate]; 
                     }
-                    saveHabits();
+                    saveHabits(); 
                     console.log(`Habit '${targetHabit.name}' on ${changedDate} changed to: ${isChecked}`);
                     // TODO: Add congratulations message here
                 }
@@ -156,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const habitList = document.getElementById('habitList');
     const prevWeekBtn = document.getElementById('prevWeekBtn');
     const nextWeekBtn = document.getElementById('nextWeekBtn');
+    const currentWeekBtn = document.getElementById('currentWeekBtn');
 
     habitDurationSelect.addEventListener('change', () => {
         if (habitDurationSelect.value === 'custom') {
@@ -185,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             durationDetails = {
-                startDate: formatDate(new Date()),
+                startDate: formatDate(new Date()), 
                 endDate: endDate
             };
         }
@@ -195,26 +198,22 @@ document.addEventListener('DOMContentLoaded', () => {
             name: habitName,
             duration: durationDetails,
             completedDates: {},
-            streak: 0
+            streak: 0 
         };
 
-        habits.push(newHabit);
+        habits.push(newHabit); 
         saveHabits();
 
-        newHabitInput.value = '';
-        habitDurationSelect.value = 'forever';
-        customEndDateInput.style.display = 'none';
+        newHabitInput.value = ''; 
+        habitDurationSelect.value = 'forever'; 
+        customEndDateInput.style.display = 'none'; 
 
-        renderHabits();
+        renderHabits(); 
     });
 
     loadHabits();
 
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-    currentWeekStart.setDate(diff);
-    currentWeekStart.setHours(0, 0, 0, 0);
+    currentWeekStart = getMondayOfWeek(new Date());
 
     renderDates();
     renderHabits();
@@ -224,11 +223,17 @@ document.addEventListener('DOMContentLoaded', () => {
     prevWeekBtn.addEventListener('click', () => {
         currentWeekStart.setDate(currentWeekStart.getDate() - 7);
         renderDates();
-        renderHabits();
+        renderHabits(); 
     });
 
     nextWeekBtn.addEventListener('click', () => {
         currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+        renderDates();
+        renderHabits();
+    });
+
+    currentWeekBtn.addEventListener('click', () => {
+        currentWeekStart = getMondayOfWeek(new Date());
         renderDates();
         renderHabits();
     });
