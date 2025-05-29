@@ -130,7 +130,16 @@ body {
     border-right: 1px solid #eee;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
+    position: relative;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}
+
+.habit-name span {
+    flex-grow: 1;
+    min-width: 0;
 }
 
 .checkbox-cell {
@@ -257,4 +266,46 @@ body.disable-interactions main.container {
     visibility: visible;
     transform: translate(-50%, -50%) scale(1);
     pointer-events: auto;
+}
+
+/* Styles for the edit/delete icons */
+.habit-action-icon {
+    font-size: 0.85em;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.1s ease;
+    flex-shrink: 0;
+}
+
+.habit-action-icon:hover {
+    color: #555;
+    transform: scale(1.1);
+}
+
+.edit-icon:hover {
+    color: #2196F3;
+}
+
+.delete-icon:hover {
+    color: #f44336;
+}
+
+/* Style for the inline edit input field */
+.edit-habit-input {
+    width: calc(100% - 16px);
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+/* Styles for the confirmation button in custom message box */
+.custom-message-box .confirm-button {
+    background-color: #4CAF50;
+    margin-left: 10px;
+}
+
+.custom-message-box .confirm-button:hover {
+    background-color: #45a049;
 }
