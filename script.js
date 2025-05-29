@@ -111,33 +111,43 @@ function showCongratulationMessage() {
 }
 
 // Custom message box for alerts/confirmations.
-// Returns a Promise that resolves when the user clicks OK.
+// Returns a Promise that resolves to true for 'Confirm' or false for 'Cancel'.
 function showCustomMessageBox(message, isConfirmation = false) {
     return new Promise(resolve => {
         const messageBox = document.getElementById('customMessageBox');
         const messageBoxText = document.getElementById('messageBoxText');
         const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
-        const messageBoxConfirmBtn = document.createElement('button'); // For confirmation
-        messageBoxConfirmBtn.id = 'messageBoxConfirmBtn';
-        messageBoxConfirmBtn.textContent = 'Confirm';
-        messageBoxConfirmBtn.classList.add('confirm-button'); // Add a class for styling
-
         const overlay = document.getElementById('overlay');
 
+        // IMPORTANT FIX: Clear all existing buttons before adding new ones
+        // This ensures no duplicate buttons accumulate
+        const existingButtons = messageBox.querySelectorAll('button');
+        existingButtons.forEach(btn => btn.removeEventListener('click', btn._handler)); // Remove old listeners
+        messageBox.innerHTML = ''; // Clear all content, then re-add text and buttons
+
         messageBoxText.textContent = message;
-        
-        // Clear previous buttons and add new ones based on type
-        messageBoxCloseBtn.style.display = 'block'; // Always show OK for now
-        if (messageBox.contains(messageBoxConfirmBtn)) {
-            messageBox.removeChild(messageBoxConfirmBtn);
+        messageBox.appendChild(messageBoxText); // Re-add the text element
+
+        const buttonContainer = document.createElement('div'); // Create a container for buttons
+        buttonContainer.classList.add('message-box-buttons'); // Add a class for styling (optional)
+
+        // Re-create the close button to ensure clean state and correct listener
+        const closeBtn = document.createElement('button');
+        closeBtn.id = 'messageBoxCloseBtn'; // Keep ID for consistency
+        closeBtn.textContent = isConfirmation ? 'Cancel' : 'OK';
+        closeBtn.classList.add('message-box-button'); // Add a common class for styling
+        buttonContainer.appendChild(closeBtn);
+
+        let confirmBtn;
+        if (isConfirmation) {
+            confirmBtn = document.createElement('button');
+            confirmBtn.id = 'messageBoxConfirmBtn';
+            confirmBtn.textContent = 'Confirm';
+            confirmBtn.classList.add('message-box-button', 'confirm-button');
+            buttonContainer.appendChild(confirmBtn);
         }
 
-        if (isConfirmation) {
-            messageBoxCloseBtn.textContent = 'Cancel'; // Change OK to Cancel
-            messageBox.appendChild(messageBoxConfirmBtn);
-        } else {
-            messageBoxCloseBtn.textContent = 'OK'; // Ensure it's OK for simple messages
-        }
+        messageBox.appendChild(buttonContainer); // Append the button container
 
         overlay.style.opacity = '1';
         overlay.style.visibility = 'visible';
@@ -145,34 +155,41 @@ function showCustomMessageBox(message, isConfirmation = false) {
         
         document.body.classList.add('disable-interactions');
 
+        // Define handlers outside to remove them later
         const closeHandler = () => {
             messageBox.classList.remove('active');
             overlay.style.opacity = '0';
             overlay.style.visibility = 'hidden';
             document.body.classList.remove('disable-interactions');
-            messageBoxCloseBtn.removeEventListener('click', closeHandler);
-            messageBoxConfirmBtn.removeEventListener('click', confirmHandler);
+            closeBtn.removeEventListener('click', closeHandler);
+            if (confirmBtn) confirmBtn.removeEventListener('click', confirmHandler);
             resolve(false); // Resolve with false if cancelled
         };
+
         const confirmHandler = () => {
             messageBox.classList.remove('active');
             overlay.style.opacity = '0';
             overlay.style.visibility = 'hidden';
             document.body.classList.remove('disable-interactions');
-            messageBoxCloseBtn.removeEventListener('click', closeHandler);
-            messageBoxConfirmBtn.removeEventListener('click', confirmHandler);
+            closeBtn.removeEventListener('click', closeHandler);
+            if (confirmBtn) confirmBtn.removeEventListener('click', confirmHandler);
             resolve(true); // Resolve with true if confirmed
         };
 
-        messageBoxCloseBtn.addEventListener('click', closeHandler);
+        // Attach event listeners
+        closeBtn.addEventListener('click', closeHandler);
+        // Store handler reference for removal (optional, but good practice for complex cases)
+        closeBtn._handler = closeHandler;
+
         if (isConfirmation) {
-            messageBoxConfirmBtn.addEventListener('click', confirmHandler);
+            confirmBtn.addEventListener('click', confirmHandler);
+            confirmBtn._handler = confirmHandler; // Store handler reference
         }
     });
 }
 
 
-// NEW FUNCTION: Handles editing a habit name
+// Handles editing a habit name
 function editHabit(habitId, currentNameDiv) {
     const targetHabit = habits.find(h => h.id === habitId);
     if (!targetHabit) return;
@@ -181,56 +198,46 @@ function editHabit(habitId, currentNameDiv) {
     const inputField = document.createElement('input');
     inputField.type = 'text';
     inputField.value = targetHabit.name;
-    inputField.classList.add('edit-habit-input'); // Add a class for styling
-    inputField.maxLength = 50; // Limit input length
+    inputField.classList.add('edit-habit-input');
+    inputField.maxLength = 50;
 
-    // Replace the name div with the input field
-    currentNameDiv.innerHTML = ''; // Clear existing content
+    // Replace the name div's content with the input field
+    currentNameDiv.innerHTML = '';
     currentNameDiv.appendChild(inputField);
 
-    inputField.focus(); // Focus the input field immediately
+    inputField.focus();
 
-    // Save changes on 'Enter' key press
-    inputField.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            const newName = inputField.value.trim();
-            if (newName === '') {
-                showCustomMessageBox('Habit name cannot be empty!');
-                inputField.focus(); // Keep focus on input
-                return;
-            }
-            targetHabit.name = newName;
-            saveHabits();
-            renderHabits(); // Re-render to show updated name and remove input
-        }
-    });
-
-    // Save changes when input loses focus
-    inputField.addEventListener('blur', () => {
+    const saveEdit = () => {
         const newName = inputField.value.trim();
         if (newName === '') {
-            // If empty on blur, revert to original name if not confirmed empty
-            // Or force user to enter a name
             showCustomMessageBox('Habit name cannot be empty! Reverting to original name.');
-            targetHabit.name = targetHabit.name; // Revert
-            saveHabits(); // Save (even if reverted)
-            renderHabits(); // Re-render
+            targetHabit.name = targetHabit.name; // Revert to original
+            saveHabits();
+            renderHabits();
             return;
         }
         targetHabit.name = newName;
         saveHabits();
-        renderHabits(); // Re-render
+        renderHabits();
+    };
+
+    inputField.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            saveEdit();
+        }
     });
+
+    inputField.addEventListener('blur', saveEdit);
 }
 
-// NEW FUNCTION: Handles deleting a habit
+// Handles deleting a habit
 async function deleteHabit(habitId, habitName) {
-    const confirmed = await showCustomMessageBox(`Are you sure you want to delete "${habitName}"? This action cannot be undone.`, true); // true for confirmation
+    const confirmed = await showCustomMessageBox(`Are you sure you want to delete "${habitName}"? This action cannot be undone.`, true);
     
     if (confirmed) {
-        habits = habits.filter(h => h.id !== habitId); // Remove habit from array
-        saveHabits(); // Save updated array
-        renderHabits(); // Re-render to remove habit from UI
+        habits = habits.filter(h => h.id !== habitId);
+        saveHabits();
+        renderHabits();
     }
 }
 
@@ -259,7 +266,6 @@ function renderHabits() {
         const habitNameDiv = document.createElement('div');
         habitNameDiv.classList.add('habit-name');
         
-        // Create a span for the habit name text, allowing icons next to it
         const habitNameText = document.createElement('span');
         habitNameText.textContent = habit.name;
         habitNameDiv.appendChild(habitNameText);
@@ -269,7 +275,7 @@ function renderHabits() {
         editIcon.classList.add('fas', 'fa-pencil-alt', 'habit-action-icon', 'edit-icon');
         editIcon.title = 'Edit Habit';
         editIcon.addEventListener('click', () => {
-            editHabit(habit.id, habitNameDiv); // Pass the habit ID and the name div
+            editHabit(habit.id, habitNameDiv);
         });
         habitNameDiv.appendChild(editIcon);
 
@@ -277,8 +283,8 @@ function renderHabits() {
         const deleteIcon = document.createElement('i');
         deleteIcon.classList.add('fas', 'fa-trash-alt', 'habit-action-icon', 'delete-icon');
         deleteIcon.title = 'Delete Habit';
-        deleteIcon.addEventListener('click', async () => { // Made async to await confirmation
-            await deleteHabit(habit.id, habit.name); // Pass habit ID and name for confirmation message
+        deleteIcon.addEventListener('click', async () => {
+            await deleteHabit(habit.id, habit.name);
         });
         habitNameDiv.appendChild(deleteIcon);
         
@@ -338,7 +344,6 @@ function renderHabits() {
                 checkboxCell.appendChild(checkbox);
             }
             
-            // Always append a cell to maintain grid alignment, even if empty
             habitRow.appendChild(checkboxCell);
         });
 
