@@ -110,15 +110,35 @@ function showCongratulationMessage() {
     }, 1500);
 }
 
-function showCustomMessageBox(message) {
+// Custom message box for alerts/confirmations.
+// Returns a Promise that resolves when the user clicks OK.
+function showCustomMessageBox(message, isConfirmation = false) {
     return new Promise(resolve => {
         const messageBox = document.getElementById('customMessageBox');
         const messageBoxText = document.getElementById('messageBoxText');
         const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
+        const messageBoxConfirmBtn = document.createElement('button'); // For confirmation
+        messageBoxConfirmBtn.id = 'messageBoxConfirmBtn';
+        messageBoxConfirmBtn.textContent = 'Confirm';
+        messageBoxConfirmBtn.classList.add('confirm-button'); // Add a class for styling
+
         const overlay = document.getElementById('overlay');
 
         messageBoxText.textContent = message;
         
+        // Clear previous buttons and add new ones based on type
+        messageBoxCloseBtn.style.display = 'block'; // Always show OK for now
+        if (messageBox.contains(messageBoxConfirmBtn)) {
+            messageBox.removeChild(messageBoxConfirmBtn);
+        }
+
+        if (isConfirmation) {
+            messageBoxCloseBtn.textContent = 'Cancel'; // Change OK to Cancel
+            messageBox.appendChild(messageBoxConfirmBtn);
+        } else {
+            messageBoxCloseBtn.textContent = 'OK'; // Ensure it's OK for simple messages
+        }
+
         overlay.style.opacity = '1';
         overlay.style.visibility = 'visible';
         messageBox.classList.add('active');
@@ -131,10 +151,87 @@ function showCustomMessageBox(message) {
             overlay.style.visibility = 'hidden';
             document.body.classList.remove('disable-interactions');
             messageBoxCloseBtn.removeEventListener('click', closeHandler);
-            resolve();
+            messageBoxConfirmBtn.removeEventListener('click', confirmHandler);
+            resolve(false); // Resolve with false if cancelled
         };
+        const confirmHandler = () => {
+            messageBox.classList.remove('active');
+            overlay.style.opacity = '0';
+            overlay.style.visibility = 'hidden';
+            document.body.classList.remove('disable-interactions');
+            messageBoxCloseBtn.removeEventListener('click', closeHandler);
+            messageBoxConfirmBtn.removeEventListener('click', confirmHandler);
+            resolve(true); // Resolve with true if confirmed
+        };
+
         messageBoxCloseBtn.addEventListener('click', closeHandler);
+        if (isConfirmation) {
+            messageBoxConfirmBtn.addEventListener('click', confirmHandler);
+        }
     });
+}
+
+
+// NEW FUNCTION: Handles editing a habit name
+function editHabit(habitId, currentNameDiv) {
+    const targetHabit = habits.find(h => h.id === habitId);
+    if (!targetHabit) return;
+
+    // Create an input field
+    const inputField = document.createElement('input');
+    inputField.type = 'text';
+    inputField.value = targetHabit.name;
+    inputField.classList.add('edit-habit-input'); // Add a class for styling
+    inputField.maxLength = 50; // Limit input length
+
+    // Replace the name div with the input field
+    currentNameDiv.innerHTML = ''; // Clear existing content
+    currentNameDiv.appendChild(inputField);
+
+    inputField.focus(); // Focus the input field immediately
+
+    // Save changes on 'Enter' key press
+    inputField.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            const newName = inputField.value.trim();
+            if (newName === '') {
+                showCustomMessageBox('Habit name cannot be empty!');
+                inputField.focus(); // Keep focus on input
+                return;
+            }
+            targetHabit.name = newName;
+            saveHabits();
+            renderHabits(); // Re-render to show updated name and remove input
+        }
+    });
+
+    // Save changes when input loses focus
+    inputField.addEventListener('blur', () => {
+        const newName = inputField.value.trim();
+        if (newName === '') {
+            // If empty on blur, revert to original name if not confirmed empty
+            // Or force user to enter a name
+            showCustomMessageBox('Habit name cannot be empty! Reverting to original name.');
+            targetHabit.name = targetHabit.name; // Revert
+            saveHabits(); // Save (even if reverted)
+            renderHabits(); // Re-render
+            return;
+        }
+        targetHabit.name = newName;
+        saveHabits();
+        renderHabits(); // Re-render
+    });
+}
+
+// NEW FUNCTION: Handles deleting a habit
+async function deleteHabit(habitId, habitName) {
+    const confirmed = await showCustomMessageBox(`Are you sure you want to delete "${habitName}"? This action cannot be undone.`, true); // true for confirmation
+    
+    if (confirmed) {
+        habits = habits.filter(h => h.id !== habitId); // Remove habit from array
+        saveHabits(); // Save updated array
+        renderHabits(); // Re-render to remove habit from UI
+    }
 }
 
 
@@ -161,9 +258,29 @@ function renderHabits() {
 
         const habitNameDiv = document.createElement('div');
         habitNameDiv.classList.add('habit-name');
-        habitNameDiv.textContent = habit.name;
         
-        // TODO: Add edit/delete icons here later
+        // Create a span for the habit name text, allowing icons next to it
+        const habitNameText = document.createElement('span');
+        habitNameText.textContent = habit.name;
+        habitNameDiv.appendChild(habitNameText);
+
+        // Create Edit Icon
+        const editIcon = document.createElement('i');
+        editIcon.classList.add('fas', 'fa-pencil-alt', 'habit-action-icon', 'edit-icon');
+        editIcon.title = 'Edit Habit';
+        editIcon.addEventListener('click', () => {
+            editHabit(habit.id, habitNameDiv); // Pass the habit ID and the name div
+        });
+        habitNameDiv.appendChild(editIcon);
+
+        // Create Delete Icon
+        const deleteIcon = document.createElement('i');
+        deleteIcon.classList.add('fas', 'fa-trash-alt', 'habit-action-icon', 'delete-icon');
+        deleteIcon.title = 'Delete Habit';
+        deleteIcon.addEventListener('click', async () => { // Made async to await confirmation
+            await deleteHabit(habit.id, habit.name); // Pass habit ID and name for confirmation message
+        });
+        habitNameDiv.appendChild(deleteIcon);
         
         habitRow.appendChild(habitNameDiv);
 
@@ -171,16 +288,9 @@ function renderHabits() {
             const checkboxCell = document.createElement('div');
             checkboxCell.classList.add('checkbox-cell');
 
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.dataset.habitId = habit.id;
-            checkbox.dataset.date = dateString;
-
-            // Normalize cellDate for accurate comparison
             const cellDate = new Date(dateString);
             cellDate.setHours(0, 0, 0, 0);
 
-            // Determine if the checkbox should be rendered at all based on duration
             let shouldRenderCheckbox = true;
             if (habit.duration !== 'forever') {
                 const habitStartDate = new Date(habit.duration.startDate);
@@ -188,19 +298,21 @@ function renderHabits() {
                 const habitEndDate = new Date(habit.duration.endDate);
                 habitEndDate.setHours(0, 0, 0, 0);
 
-                // If the cellDate is outside the habit's start and end dates, don't render
                 if (cellDate < habitStartDate || cellDate > habitEndDate) {
                     shouldRenderCheckbox = false;
                 }
             }
 
             if (shouldRenderCheckbox) {
-                // Only proceed to add checkbox if it should be rendered
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.dataset.habitId = habit.id;
+                checkbox.dataset.date = dateString;
+
                 if (habit.completedDates[dateString]) {
                     checkbox.checked = true;
                 }
 
-                // Disable checkboxes for future dates
                 if (cellDate > today) {
                     checkbox.disabled = true;
                     checkboxCell.classList.add('disabled-day');
@@ -225,19 +337,9 @@ function renderHabits() {
 
                 checkboxCell.appendChild(checkbox);
             }
-            // Append the cell (which might be empty if shouldRenderCheckbox is false)
-            // Or, more cleanly, only append if shouldRenderCheckbox is true
-            if (shouldRenderCheckbox) {
-                habitRow.appendChild(checkboxCell);
-            } else {
-                // If not rendering checkbox, still append an empty cell to maintain grid alignment
-                // This ensures the habit name column aligns with the date columns
-                const emptyPlaceholderCell = document.createElement('div');
-                emptyPlaceholderCell.classList.add('checkbox-cell'); // Maintain styling
-                // Optional: add a class to visually indicate it's an empty slot if needed
-                // emptyPlaceholderCell.classList.add('empty-slot');
-                habitRow.appendChild(emptyPlaceholderCell);
-            }
+            
+            // Always append a cell to maintain grid alignment, even if empty
+            habitRow.appendChild(checkboxCell);
         });
 
         habitList.appendChild(habitRow);
