@@ -1,17 +1,6 @@
-// Global array to store all habit data.
-// Each habit object will look something like:
-// {
-//   id: 'unique-id',
-//   name: 'Read 30 mins',
-//   duration: 'forever' or { startDate: 'YYYY-MM-DD', endDate: 'YYYY-MM-DD' },
-//   completedDates: { 'YYYY-MM-DD': true }, // true if completed, false or absent if not
-//   streak: 0
-// }
 let habits = [];
-// Stores the Monday of the week currently displayed.
 let currentWeekStart = new Date();
 
-// Loads habits from localStorage on page load.
 function loadHabits() {
   const storedHabits = localStorage.getItem('habits');
   if (storedHabits) {
@@ -19,17 +8,15 @@ function loadHabits() {
       habits = JSON.parse(storedHabits);
     } catch (e) {
       console.error('Error parsing habits from localStorage:', e);
-      habits = []; // Reset if parsing fails
+      habits = [];
     }
   }
 }
 
-// Saves current habits array to localStorage.
 function saveHabits() {
   localStorage.setItem('habits', JSON.stringify(habits));
 }
 
-// Helper: Formats a Date object into a 'YYYY-MM-DD' string.
 function formatDate(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -37,31 +24,25 @@ function formatDate(date) {
     return `${year}-${month}-${day}`;
 }
 
-// Helper: Returns a new Date object representing the Monday of the given date's week.
 function getMondayOfWeek(date) {
-    const d = new Date(date); // Create a copy to avoid modifying original
-    const dayOfWeek = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    // Adjust to Monday (if Sunday, subtract 6 days to get previous Monday, otherwise subtract dayOfWeek-1)
+    const d = new Date(date);
+    const dayOfWeek = d.getDay();
     const diff = d.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
     d.setDate(diff);
-    d.setHours(0, 0, 0, 0); // Normalize to start of day
+    d.setHours(0, 0, 0, 0);
     return d;
 }
 
-// Renders the date headers for the current week.
 function renderDates() {
     const gridHeader = document.querySelector('.grid-header');
     
-    // Clear existing date columns, keeping the "Habit" label.
     while (gridHeader.children.length > 1) {
         gridHeader.removeChild(gridHeader.lastChild);
     }
 
-    // Use currentWeekStart (which is always a Monday) as the base for the week.
     const weekStart = new Date(currentWeekStart);
-
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize today's date for comparison
+    today.setHours(0, 0, 0, 0);
 
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
@@ -73,13 +54,13 @@ function renderDates() {
     weekDates.forEach(date => {
         const dateColumn = document.createElement('div');
         dateColumn.classList.add('date-column');
-        dateColumn.dataset.fullDate = formatDate(date); // Store full date string
+        dateColumn.dataset.fullDate = formatDate(date);
 
         const options = { weekday: 'short', month: 'short', day: 'numeric' };
         dateColumn.textContent = date.toLocaleDateString('en-US', options);
 
         if (date.toDateString() === today.toDateString()) {
-            dateColumn.classList.add('today-column'); // Highlight today's date
+            dateColumn.classList.add('today-column');
         }
 
         gridHeader.appendChild(dateColumn);
@@ -91,7 +72,6 @@ function showCongratulationMessage() {
     let messageContainer = document.getElementById('congratulationsMessage');
     let overlay = document.getElementById('overlay');
 
-    // Create message container if it doesn't exist
     if (!messageContainer) {
         messageContainer = document.createElement('div');
         messageContainer.id = 'congratulationsMessage';
@@ -99,19 +79,11 @@ function showCongratulationMessage() {
         document.body.appendChild(messageContainer);
     }
 
-    // More varied and encouraging messages
     const messages = [
-        "Awesome work!",
-        "You're crushing it!",
-        "Keep the momentum!",
-        "Great job!",
-        "Another one down!",
-        "Way to go!",
-        "You're building momentum!",
-        "Fantastic effort!",
-        "Keep up the great work!",
-        "Success!",
-        "Nailed it!"
+        "Awesome work!", "You're crushing it!", "Keep the momentum!",
+        "Great job!", "Another one down!", "Way to go!",
+        "You're building momentum!", "Fantastic effort!", "Keep up the great work!",
+        "Success!", "Nailed it!"
     ];
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
 
@@ -131,10 +103,10 @@ function showCongratulationMessage() {
     setTimeout(() => {
         messageContainer.style.opacity = '0';
         messageContainer.style.transform = 'translate(-50%, -50%) scale(0.8)';
-        messageContainer.style.visibility = 'hidden'; // Hide after transition
+        messageContainer.style.visibility = 'hidden';
 
         overlay.style.opacity = '0';
-        overlay.style.visibility = 'hidden'; // Hide after transition
+        overlay.style.visibility = 'hidden';
 
         // Re-enable interactions after the message and overlay are fully hidden
         setTimeout(() => {
@@ -143,17 +115,48 @@ function showCongratulationMessage() {
     }, 1500); // Display message for 1.5 seconds
 }
 
-// Renders all habits from the 'habits' array to the UI with checkboxes.
+// NEW FUNCTION: Displays a custom message box instead of alert().
+// Returns a Promise that resolves when the user clicks OK.
+function showCustomMessageBox(message) {
+    return new Promise(resolve => {
+        const messageBox = document.getElementById('customMessageBox');
+        const messageBoxText = document.getElementById('messageBoxText');
+        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
+        const overlay = document.getElementById('overlay');
+
+        messageBoxText.textContent = message;
+        
+        // Show overlay and message box
+        overlay.style.opacity = '1';
+        overlay.style.visibility = 'visible';
+        messageBox.classList.add('active'); // Use class for active state
+        
+        // Disable interactions on the rest of the page
+        document.body.classList.add('disable-interactions');
+
+        // Event listener for the close button
+        const closeHandler = () => {
+            messageBox.classList.remove('active'); // Hide message box
+            overlay.style.opacity = '0';
+            overlay.style.visibility = 'hidden';
+            document.body.classList.remove('disable-interactions'); // Re-enable interactions
+            messageBoxCloseBtn.removeEventListener('click', closeHandler); // Clean up listener
+            resolve(); // Resolve the promise
+        };
+        messageBoxCloseBtn.addEventListener('click', closeHandler);
+    });
+}
+
+
 function renderHabits() {
     const habitList = document.getElementById('habitList');
-    habitList.innerHTML = ''; // Clear existing habit rows
+    habitList.innerHTML = '';
 
-    // Recalculate week dates based on currentWeekStart for consistency.
     const currentWeekFormattedDates = [];
-    const weekStart = new Date(currentWeekStart); // Use currentWeekStart which is already Monday
+    const weekStart = new Date(currentWeekStart);
     
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize today's date for comparison
+    today.setHours(0, 0, 0, 0);
 
     for (let i = 0; i < 7; i++) {
         const date = new Date(weekStart);
@@ -164,7 +167,7 @@ function renderHabits() {
     habits.forEach(habit => {
         const habitRow = document.createElement('div');
         habitRow.classList.add('habit-row');
-        habitRow.dataset.habitId = habit.id; // Store habit ID for lookup
+        habitRow.dataset.habitId = habit.id;
 
         const habitNameDiv = document.createElement('div');
         habitNameDiv.classList.add('habit-name');
@@ -180,24 +183,21 @@ function renderHabits() {
 
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.dataset.habitId = habit.id; // Link checkbox to habit
-            checkbox.dataset.date = dateString; // Link checkbox to date
+            checkbox.dataset.habitId = habit.id;
+            checkbox.dataset.date = dateString;
 
-            // Set checked state based on saved data.
             if (habit.completedDates[dateString]) {
                 checkbox.checked = true;
             }
 
-            // Disable checkboxes for future dates.
             const cellDate = new Date(dateString);
-            cellDate.setHours(0, 0, 0, 0); // Normalize for accurate comparison
+            cellDate.setHours(0, 0, 0, 0);
 
             if (cellDate > today) {
                 checkbox.disabled = true;
-                checkboxCell.classList.add('disabled-day'); // Apply visual dimming
+                checkboxCell.classList.add('disabled-day');
             }
 
-            // Event listener for checkbox changes.
             checkbox.addEventListener('change', (event) => {
                 const changedHabitId = event.target.dataset.habitId;
                 const changedDate = event.target.dataset.date;
@@ -207,11 +207,11 @@ function renderHabits() {
                 if (targetHabit) {
                     if (isChecked) {
                         targetHabit.completedDates[changedDate] = true;
-                        showCongratulationMessage(); // Show message on check
+                        showCongratulationMessage();
                     } else {
-                        delete targetHabit.completedDates[changedDate]; // Remove if unchecked
+                        delete targetHabit.completedDates[changedDate];
                     }
-                    saveHabits(); // Persist changes
+                    saveHabits();
                 }
             });
 
@@ -238,18 +238,17 @@ document.addEventListener('DOMContentLoaded', () => {
     habitDurationSelect.addEventListener('change', () => {
         if (habitDurationSelect.value === 'custom') {
             customEndDateInput.style.display = 'inline-block';
-            customEndDateInput.min = formatDate(new Date()); // Set min date for customEndDate to today
+            customEndDateInput.min = formatDate(new Date());
         } else {
             customEndDateInput.style.display = 'none';
         }
     });
 
     // Event listener for adding a habit.
-    addHabitBtn.addEventListener('click', () => {
+    addHabitBtn.addEventListener('click', async () => { // Made async to await message box
         const habitName = newHabitInput.value.trim();
         if (habitName === '') {
-            // TODO: Replace with a custom modal/message box later
-            alert('Please enter a habit name!');
+            await showCustomMessageBox('Please enter a habit name!'); // Replaced alert()
             return;
         }
 
@@ -259,40 +258,39 @@ document.addEventListener('DOMContentLoaded', () => {
         if (durationType === 'custom') {
             const endDate = customEndDateInput.value;
             if (!endDate) {
-                // TODO: Replace with a custom modal/message box later
-                alert('Please select a custom end date!');
+                await showCustomMessageBox('Please select a custom end date!'); // Replaced alert()
                 return;
             }
             durationDetails = {
-                startDate: formatDate(new Date()), // Assume start is always today for custom
+                startDate: formatDate(new Date()),
                 endDate: endDate
             };
         }
 
         const newHabit = {
-            id: Date.now().toString(), // Unique ID
+            id: Date.now().toString(),
             name: habitName,
             duration: durationDetails,
-            completedDates: {}, // Initialize completion tracking
-            streak: 0 // Initialize streak
+            completedDates: {},
+            streak: 0
         };
 
         habits.push(newHabit);
         saveHabits();
 
-        newHabitInput.value = ''; // Clear input
-        habitDurationSelect.value = 'forever'; // Reset select
-        customEndDateInput.style.display = 'none'; // Hide custom date input
+        newHabitInput.value = '';
+        habitDurationSelect.value = 'forever';
+        customEndDateInput.style.display = 'none';
 
-        renderHabits(); // Re-render to show new habit
+        renderHabits();
     });
 
     // Initial setup when the DOM is fully loaded.
     loadHabits();
-    currentWeekStart = getMondayOfWeek(new Date()); // Set to current week's Monday
+    currentWeekStart = getMondayOfWeek(new Date());
     renderDates();
     renderHabits();
-    customEndDateInput.style.display = 'none'; // Ensure hidden on load
+    customEndDateInput.style.display = 'none';
 
     // Event Listeners for Week Navigation.
     prevWeekBtn.addEventListener('click', () => {
@@ -308,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     currentWeekBtn.addEventListener('click', () => {
-        currentWeekStart = getMondayOfWeek(new Date()); // Reset to current week
+        currentWeekStart = getMondayOfWeek(new Date());
         renderDates();
         renderHabits();
     });

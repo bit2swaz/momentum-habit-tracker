@@ -176,7 +176,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.8);
-    background-color: #4CAF50; 
+    background-color: #4CAF50;
     color: white;
     padding: 20px 30px;
     border-radius: 10px;
@@ -188,8 +188,8 @@ body {
     visibility: hidden;
     transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0.5s ease-out;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    pointer-events: none;
 }
-
 .overlay {
     position: fixed;
     top: 0;
@@ -203,7 +203,7 @@ body {
     transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
 }
 
-body.disable-interactions *:not(.congratulations-message):not(.overlay) {
+body.disable-interactions main.container {
     pointer-events: none;
 }
 
@@ -212,7 +212,7 @@ body.disable-interactions *:not(.congratulations-message):not(.overlay) {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.8);
-    background-color: #f44336; 
+    background-color: #f44336;
     color: white;
     padding: 25px 35px;
     border-radius: 10px;
@@ -228,6 +228,7 @@ body.disable-interactions *:not(.congratulations-message):not(.overlay) {
     align-items: center;
     gap: 20px;
     max-width: 350px;
+    pointer-events: none;
 }
 
 .custom-message-box p {
@@ -244,6 +245,7 @@ body.disable-interactions *:not(.congratulations-message):not(.overlay) {
     cursor: pointer;
     font-size: 1em;
     transition: background-color 0.2s ease;
+    pointer-events: auto;
 }
 
 .custom-message-box button:hover {
@@ -254,4 +256,5 @@ body.disable-interactions *:not(.congratulations-message):not(.overlay) {
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
 }
