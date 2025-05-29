@@ -176,43 +176,68 @@ function renderHabits() {
             checkbox.dataset.habitId = habit.id;
             checkbox.dataset.date = dateString;
 
-            if (habit.completedDates[dateString]) {
-                checkbox.checked = true;
-            }
-
+            // Normalize cellDate for accurate comparison
             const cellDate = new Date(dateString);
             cellDate.setHours(0, 0, 0, 0);
 
-            // Disable checkboxes for future dates OR dates outside the habit's duration.
-            const isFutureDate = cellDate > today;
-            const isOutsideDuration = habit.duration !== 'forever' && 
-                                      (cellDate < new Date(habit.duration.startDate).setHours(0,0,0,0) || 
-                                       cellDate > new Date(habit.duration.endDate).setHours(0,0,0,0));
+            // Determine if the checkbox should be rendered at all based on duration
+            let shouldRenderCheckbox = true;
+            if (habit.duration !== 'forever') {
+                const habitStartDate = new Date(habit.duration.startDate);
+                habitStartDate.setHours(0, 0, 0, 0);
+                const habitEndDate = new Date(habit.duration.endDate);
+                habitEndDate.setHours(0, 0, 0, 0);
 
-            if (isFutureDate || isOutsideDuration) {
-                checkbox.disabled = true;
-                checkboxCell.classList.add('disabled-day');
+                // If the cellDate is outside the habit's start and end dates, don't render
+                if (cellDate < habitStartDate || cellDate > habitEndDate) {
+                    shouldRenderCheckbox = false;
+                }
             }
 
-            checkbox.addEventListener('change', (event) => {
-                const changedHabitId = event.target.dataset.habitId;
-                const changedDate = event.target.dataset.date;
-                const isChecked = event.target.checked;
-
-                const targetHabit = habits.find(h => h.id === changedHabitId);
-                if (targetHabit) {
-                    if (isChecked) {
-                        targetHabit.completedDates[changedDate] = true;
-                        showCongratulationMessage();
-                    } else {
-                        delete targetHabit.completedDates[changedDate];
-                    }
-                    saveHabits();
+            if (shouldRenderCheckbox) {
+                // Only proceed to add checkbox if it should be rendered
+                if (habit.completedDates[dateString]) {
+                    checkbox.checked = true;
                 }
-            });
 
-            checkboxCell.appendChild(checkbox);
-            habitRow.appendChild(checkboxCell);
+                // Disable checkboxes for future dates
+                if (cellDate > today) {
+                    checkbox.disabled = true;
+                    checkboxCell.classList.add('disabled-day');
+                }
+
+                checkbox.addEventListener('change', (event) => {
+                    const changedHabitId = event.target.dataset.habitId;
+                    const changedDate = event.target.dataset.date;
+                    const isChecked = event.target.checked;
+
+                    const targetHabit = habits.find(h => h.id === changedHabitId);
+                    if (targetHabit) {
+                        if (isChecked) {
+                            targetHabit.completedDates[changedDate] = true;
+                            showCongratulationMessage();
+                        } else {
+                            delete targetHabit.completedDates[changedDate];
+                        }
+                        saveHabits();
+                    }
+                });
+
+                checkboxCell.appendChild(checkbox);
+            }
+            // Append the cell (which might be empty if shouldRenderCheckbox is false)
+            // Or, more cleanly, only append if shouldRenderCheckbox is true
+            if (shouldRenderCheckbox) {
+                habitRow.appendChild(checkboxCell);
+            } else {
+                // If not rendering checkbox, still append an empty cell to maintain grid alignment
+                // This ensures the habit name column aligns with the date columns
+                const emptyPlaceholderCell = document.createElement('div');
+                emptyPlaceholderCell.classList.add('checkbox-cell'); // Maintain styling
+                // Optional: add a class to visually indicate it's an empty slot if needed
+                // emptyPlaceholderCell.classList.add('empty-slot');
+                habitRow.appendChild(emptyPlaceholderCell);
+            }
         });
 
         habitList.appendChild(habitRow);
@@ -251,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const durationType = habitDurationSelect.value;
         let durationDetails = 'forever';
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Normalize today for calculations
+        today.setHours(0, 0, 0, 0);
 
         if (durationType === 'custom') {
             const endDate = customEndDateInput.value;
@@ -265,14 +290,14 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         } else if (durationType === '1week') {
             const oneWeekLater = new Date(today);
-            oneWeekLater.setDate(today.getDate() + 7); // Add 7 days
+            oneWeekLater.setDate(today.getDate() + 7);
             durationDetails = {
                 startDate: formatDate(today),
                 endDate: formatDate(oneWeekLater)
             };
         } else if (durationType === '1month') {
             const oneMonthLater = new Date(today);
-            oneMonthLater.setMonth(today.getMonth() + 1); // Add 1 month
+            oneMonthLater.setMonth(today.getMonth() + 1);
             durationDetails = {
                 startDate: formatDate(today),
                 endDate: formatDate(oneMonthLater)
