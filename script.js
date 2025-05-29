@@ -1,3 +1,22 @@
+let habits = [];
+
+function loadHabits() {
+    const storedHabits = localStorage.getItem('habits');
+    if (storedHabits) {
+        try {
+            habits = JSON.parse(storedHabits);
+            console.log('Habits loaded:', habits);
+        } catch (e) {
+            console.error('Error parsing habits from localStorage:', e);
+        }
+    }
+}
+
+function saveHabits() {
+    localStorage.setItem('habits', JSON.stringify(habits));
+    console.log('Habits saved:', habits);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const newHabitInput = document.getElementById('newHabitInput');
     const habitDurationSelect = document.getElementById('habitDuration');
@@ -15,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
             customEndDateInput.style.display = 'none';
         }
     });
-
+    
+    loadHabits();
     customEndDateInput.style.display = 'none';
 });
