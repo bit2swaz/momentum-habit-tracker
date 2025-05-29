@@ -66,3 +66,16 @@ body {
     background-color: #4a148c;
 }
 
+.duration-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tracker-grid {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    overflow-x: auto;
+}
