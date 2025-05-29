@@ -206,3 +206,52 @@ body {
 body.disable-interactions *:not(.congratulations-message):not(.overlay) {
     pointer-events: none;
 }
+
+.custom-message-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background-color: #f44336; 
+    color: white;
+    padding: 25px 35px;
+    border-radius: 10px;
+    font-size: 1.2em;
+    text-align: center;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out, visibility 0.3s ease-out;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 350px;
+}
+
+.custom-message-box p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.custom-message-box button {
+    padding: 10px 25px;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease;
+}
+
+.custom-message-box button:hover {
+    background-color: #c62828;
+}
+
+.custom-message-box.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
