@@ -72,49 +72,58 @@ body {
     gap: 10px;
 }
 
+/* UPDATED: tracker-grid to use CSS Grid */
 .tracker-grid {
-    display: flex;
-    flex-direction: column;
+    display: grid; /* Use CSS Grid for layout */
+    /* Define 8 columns: 1 for habit name, 7 equal for days */
+    grid-template-columns: 1.5fr repeat(7, 1fr); /* 1.5fr for habit name, 1fr for each day */
     border: 1px solid #eee;
     border-radius: 6px;
-    overflow-x: auto;
+    /* Optional: A minimum width to ensure columns don't shrink too much on very small screens.
+       You might need to adjust this or use media queries for true responsiveness. */
+    min-width: 650px; /* Adjusted slightly for better fit, test on various screens */
 }
 
+/* NEW: Ensure grid children participate in the parent's grid */
+.grid-header,
+.habit-list,
+.habit-row {
+    display: contents; /* Makes children participate in the grid of the parent (.tracker-grid) */
+}
+
+/* UPDATED: grid-header */
 .grid-header {
-    display: flex;
     background-color: #f9f9f9;
     border-bottom: 1px solid #eee;
-    padding: 10px 0;
     font-weight: bold;
     position: sticky;
     top: 0;
     z-index: 10;
 }
 
+/* UPDATED: habit-label */
 .habit-label {
-    flex-basis: 150px;
-    min-width: 150px;
-    padding: 0 15px;
+    grid-column: 1; /* This element occupies the first column of the .tracker-grid */
+    padding: 15px; /* Adjusted padding for better visual balance in grid */
     text-align: left;
     border-right: 1px solid #eee;
 }
 
+/* UPDATED: date-column */
 .date-column {
-    flex-basis: 100px;
-    min-width: 100px;
     text-align: center;
-    padding: 0 5px;
+    padding: 15px 5px; /* Adjusted padding for better visual balance in grid */
     border-right: 1px solid #eee;
+    font-size: 0.9em; /* Slightly smaller font for dates to fit better */
 }
 
 .date-column:last-child {
     border-right: none;
 }
 
+/* UPDATED: habit-row */
 .habit-row {
-    display: flex;
-    align-items: center;
-    padding: 10px 0;
+    align-items: center; /* Still useful for vertical alignment within grid cells */
     border-bottom: 1px solid #eee;
 }
 
@@ -122,10 +131,10 @@ body {
     border-bottom: none;
 }
 
+/* UPDATED: habit-name */
 .habit-name {
-    flex-basis: 150px;
-    min-width: 150px;
-    padding: 0 15px;
+    grid-column: 1; /* This element occupies the first column of the .tracker-grid */
+    padding: 10px 15px; /* Adjusted padding for rows */
     text-align: left;
     border-right: 1px solid #eee;
     display: flex;
@@ -142,11 +151,12 @@ body {
     min-width: 0;
 }
 
+/* UPDATED: checkbox-cell */
 .checkbox-cell {
-    flex-basis: 100px;
-    min-width: 100px;
-    text-align: center;
-    padding: 0 5px;
+    display: flex; /* Keep flex for centering checkbox */
+    justify-content: center; /* Center checkbox horizontally */
+    align-items: center; /* Center checkbox vertically */
+    padding: 10px 5px; /* Adjusted padding for rows */
     border-right: 1px solid #eee;
 }
 
@@ -245,9 +255,18 @@ body.disable-interactions main.container {
     line-height: 1.4;
 }
 
+/* NEW: Style for the button container inside the message box */
+.message-box-buttons {
+    display: flex;
+    gap: 15px; /* Space between buttons */
+    justify-content: center;
+    width: 100%; /* Take full width of parent */
+}
+
+/* UPDATED: Common style for message box buttons */
 .custom-message-box button {
     padding: 10px 25px;
-    background-color: #d32f2f;
+    background-color: #d32f2f; /* Default red for OK/Cancel */
     color: white;
     border: none;
     border-radius: 5px;
@@ -255,6 +274,8 @@ body.disable-interactions main.container {
     font-size: 1em;
     transition: background-color 0.2s ease;
     pointer-events: auto;
+    flex-grow: 1; /* Allow buttons to grow and fill space */
+    max-width: 120px; /* Max width for individual buttons */
 }
 
 .custom-message-box button:hover {
@@ -272,7 +293,7 @@ body.disable-interactions main.container {
 .habit-action-icon {
     font-size: 0.85em;
     color: #888;
-    cursor: pointer;
+    cursor: pointer; /* Added this line */
     transition: color 0.2s ease, transform 0.1s ease;
     flex-shrink: 0;
 }
@@ -302,10 +323,16 @@ body.disable-interactions main.container {
 
 /* Styles for the confirmation button in custom message box */
 .custom-message-box .confirm-button {
-    background-color: #4CAF50;
-    margin-left: 10px;
+    background-color: #4CAF50; /* Green for confirm */
 }
 
 .custom-message-box .confirm-button:hover {
     background-color: #45a049;
+}
+
+/* NEW: Style for today's column highlighting */
+.today-column {
+    background-color: #e0f2f7; /* Light blue background for today */
+    color: #01579b; /* Darker blue text */
+    border-radius: 4px; /* Slightly rounded corners for the highlight */
 }
