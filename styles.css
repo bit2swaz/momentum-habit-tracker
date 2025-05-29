@@ -147,5 +147,27 @@ body {
 
 .navigation-buttons {
     text-align: center;
-    
+    margin-bottom: 20px;
+}
+
+.navigation-buttons button {
+    padding: 8px 15px;
+    background-color: #8e24aa;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0 5px;
+    transition: background-color 0.2s ease;
+}
+
+.navigation-buttons button:hover {
+    background-color: #6a1b9a;
+}
+
+/* Styles for disabled checkboxes / cells */
+.disabled-day {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: not-allowed;
 }
