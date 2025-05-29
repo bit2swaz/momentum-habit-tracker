@@ -19,3 +19,17 @@ body {
     margin-bottom: 5px;
 }
 
+.app-description {
+    font-size: 1.1em;
+    color: #777;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
