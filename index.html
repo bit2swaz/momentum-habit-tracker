@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Momentum: Habit Tracker</title>
+    <title>Momentum Habit Tracker</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
     <header class="app-header">
         <h1 class="app-title">Momentum: The Minimalist Habit Tracker</h1>
-        <p class="app-description">Build momentum with consistent habit tracking, one day at a time.</p>
+        <p class="app-description">Build momentum with consistent habits, one day at a time.</p>
     </header>
 
     <main class="container">
@@ -23,25 +24,25 @@
                     <option value="1month">1 Month</option>
                     <option value="custom">Custom Date</option>
                 </select>
-                <input type="date" id="customEndDate" style="display: none;">
-            </div>
+                <input type="date" id="customEndDate" style="display: none;"> </div>
             <button id="addHabitBtn">Add Habit</button>
         </section>
 
         <section class="habit-tracker-display">
-            <div class="grid-header">
+            <div class="navigation-buttons">
                 <button id="prevWeekBtn">&lt; Previous Week</button>
                 <button id="nextWeekBtn">Next Week &gt;</button>
             </div>
             <div id="trackerGrid" class="tracker-grid">
                 <div class="grid-header">
                     <div class="habit-label">Habit</div>
-                </div>
-                <div id="habitList" class="habit-list"></div>
+                    </div>
+                <div id="habitList" class="habit-list">
+                    </div>
             </div>
         </section>
     </main>
 
-    <script src="script.js" defer></script>
+    <script src="script.js"></script>
 </body>
 </html>
