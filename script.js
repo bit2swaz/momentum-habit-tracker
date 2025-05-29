@@ -39,8 +39,9 @@ function renderDates() {
     weekStart.setDate(diff);
     weekStart.setHours(0, 0, 0, 0);
 
-    const today = new Date();
+    const today = new Date(); 
     today.setHours(0, 0, 0, 0);
+
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
         const date = new Date(weekStart);
@@ -51,7 +52,6 @@ function renderDates() {
     weekDates.forEach(date => {
         const dateColumn = document.createElement('div');
         dateColumn.classList.add('date-column');
-
         dateColumn.dataset.fullDate = formatDate(date);
 
         const options = { weekday: 'short', month: 'short', day: 'numeric' };
@@ -105,7 +105,7 @@ function renderHabits() {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.dataset.habitId = habit.id;
-            checkbox.dataset.date = dateString;
+            checkbox.dataset.date = dateString; 
 
             if (habit.completedDates[dateString]) {
                 checkbox.checked = true;
@@ -118,6 +118,7 @@ function renderHabits() {
                 checkbox.disabled = true;
                 checkboxCell.classList.add('disabled-day');
             }
+
             checkbox.addEventListener('change', (event) => {
                 const changedHabitId = event.target.dataset.habitId;
                 const changedDate = event.target.dataset.date;
@@ -200,9 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
         habits.push(newHabit);
         saveHabits();
 
-        newHabitInput.value = ''; 
+        newHabitInput.value = '';
         habitDurationSelect.value = 'forever';
-        customEndDateInput.style.display = 'none'; 
+        customEndDateInput.style.display = 'none';
 
         renderHabits();
     });
@@ -217,5 +218,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderDates();
     renderHabits();
+
     customEndDateInput.style.display = 'none';
+
+    prevWeekBtn.addEventListener('click', () => {
+        currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+        renderDates();
+        renderHabits();
+    });
+
+    nextWeekBtn.addEventListener('click', () => {
+        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+        renderDates();
+        renderHabits();
+    });
 });
