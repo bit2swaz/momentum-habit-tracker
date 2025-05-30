@@ -352,38 +352,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevWeekBtn = document.getElementById('prevWeekBtn');
     const nextWeekBtn = document.getElementById('nextWeekBtn');
     const currentWeekBtn = document.getElementById('currentWeekBtn');
-    const themeToggle = document.getElementById('checkbox');
-    const themeIcon = document.getElementById('themeIcon'); // NEW: Reference to the theme icon
+    const themeToggleButton = document.getElementById('themeToggleButton');
+    const themeIcon = document.getElementById('themeIcon');
 
     // Function to apply the saved theme or default to light
     function applyTheme() {
         const savedTheme = localStorage.getItem('theme');
+        // Check if the body currently has the dark-theme class
+        const isBodyDark = document.body.classList.contains('dark-theme');
+
         if (savedTheme === 'dark') {
-            document.body.classList.add('dark-theme');
-            themeToggle.checked = true; // Set toggle state
-            themeIcon.classList.remove('fa-sun'); // NEW: Change icon to moon
-            themeIcon.classList.add('fa-moon');   // NEW: Change icon to moon
-        } else {
-            document.body.classList.remove('dark-theme');
-            themeToggle.checked = false; // Set toggle state
-            themeIcon.classList.remove('fa-moon'); // NEW: Change icon to sun
-            themeIcon.classList.add('fa-sun');   // NEW: Change icon to sun
+            // If saved theme is dark AND body is not dark, add the class
+            if (!isBodyDark) {
+                document.body.classList.add('dark-theme');
+            }
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        } else { // savedTheme is 'light' or null/undefined
+            // If saved theme is light/none AND body is dark, remove the class
+            if (isBodyDark) {
+                document.body.classList.remove('dark-theme');
+            }
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
         }
     }
 
-    // NEW: Event listener for theme toggle
-    themeToggle.addEventListener('change', () => {
-        if (themeToggle.checked) {
-            document.body.classList.add('dark-theme');
+    // Event listener for theme toggle button
+    themeToggleButton.addEventListener('click', () => {
+        // Toggle the dark-theme class on the body and get its new state
+        const isDark = document.body.classList.toggle('dark-theme');
+        console.log('Toggling theme. isDark:', isDark); // Debugging log
+
+        // Update localStorage and icon based on the new state
+        if (isDark) {
             localStorage.setItem('theme', 'dark');
-            themeIcon.classList.remove('fa-sun'); // NEW: Change icon to moon
-            themeIcon.classList.add('fa-moon');   // NEW: Change icon to moon
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
         } else {
-            document.body.classList.remove('dark-theme');
             localStorage.setItem('theme', 'light');
-            themeIcon.classList.remove('fa-moon'); // NEW: Change icon to sun
-            themeIcon.classList.add('fa-sun');   // NEW: Change icon to sun
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
         }
+
+        // Add/remove rotated class for animation
+        themeToggleButton.classList.add('rotated'); // Always add to trigger animation
+        setTimeout(() => {
+            themeToggleButton.classList.remove('rotated');
+        }, 500); // Match CSS transition duration
     });
 
     // Event listener for duration select to show/hide custom date input.
