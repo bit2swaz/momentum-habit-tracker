@@ -451,6 +451,35 @@ function renderHabits() {
     });
 }
 
+const motivationalQuotes = [
+    "The best way to predict the future is to create it. – Peter Drucker",
+    "Believe you can and you're halfway there. – Theodore Roosevelt",
+    "The only way to do great work is to love what you do. – Steve Jobs",
+    "Success is not final, failure is not fatal: It is the courage to continue that counts. – Winston Churchill",
+    "The future belongs to those who believe in the beauty of their dreams. – Eleanor Roosevelt",
+    "It does not matter how slowly you go as long as you do not stop. – Confucius",
+    "Our greatest weakness lies in giving up. The most certain way to succeed is always to try just one more time. – Thomas A. Edison",
+    "The only limit to our realization of tomorrow will be our doubts of today. – Franklin D. Roosevelt",
+    "Keep your eyes on the stars, and your feet on the ground. – Theodore Roosevelt",
+    "The mind is everything. What you think you become. – Buddha",
+    "Either you run the day, or the day runs you. – Jim Rohn",
+    "Don’t count the days, make the days count. – Muhammad Ali",
+    "The journey of a thousand miles begins with a single step. – Lao Tzu",
+    "Start where you are. Use what you have. Do what you can. – Arthur Ashe",
+    "Action is the foundational key to all success. – Pablo Picasso",
+    "The will to win, the desire to succeed, the urge to reach your full potential... these are the keys that will unlock the door to personal excellence. – Confucius",
+    "Your habits become your future.",
+    "Small steps every day lead to great achievements."
+];
+
+function displayRandomQuote() {
+    const quoteElement = document.getElementById('motivationalQuote');
+    if (quoteElement) {
+        const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+        quoteElement.textContent = motivationalQuotes[randomIndex];
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const newHabitInput = document.getElementById('newHabitInput');
     const habitDurationSelect = document.getElementById('habitDuration');
@@ -604,4 +633,6 @@ document.addEventListener('DOMContentLoaded', () => {
             behavior: 'smooth'
         });
     });
+
+    displayRandomQuote();
 });
