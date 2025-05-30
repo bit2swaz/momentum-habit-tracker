@@ -336,3 +336,89 @@ body.disable-interactions main.container {
     color: #01579b; /* Darker blue text */
     border-radius: 4px; /* Slightly rounded corners for the highlight */
 }
+
+/* NEW: Styles for the theme switch wrapper positioning */
+.theme-switch-wrapper {
+    position: fixed; /* Fixed position relative to the viewport */
+    top: 20px; /* 20px from the top */
+    right: 20px; /* 20px from the right */
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between the icon and the switch */
+    z-index: 100; /* Ensure it's above most content, but below modals */
+}
+
+.theme-switch-wrapper .theme-switch { /* Make sure the label (the switch itself) is aligned */
+    margin: 0; /* Remove any default margin from the label */
+}
+
+/* NEW: Style for the theme icon */
+.theme-switch-wrapper #themeIcon {
+    font-size: 1.5em; /* Adjust size as needed */
+    color: #777; /* Default icon color for light theme */
+    transition: color 0.3s ease; /* Smooth transition for color change */
+}
+
+/* Adjustments for dark mode theme icon color */
+body.dark-theme .theme-switch-wrapper #themeIcon {
+    color: #f0f0f0; /* Lighter color for dark theme */
+}
+
+/* ... (keep all your existing dark mode styles) ... */
+body.dark-theme {
+    background-color: #2c2c2c;
+    color: #f0f0f0;
+}
+
+body.dark-theme .app-header,
+body.dark-theme .app-title,
+body.dark-theme .app-description {
+    color: #f0f0f0;
+}
+
+body.dark-theme .container {
+    background-color: #3c3c3c;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+body.dark-theme .habit-input-section input[type="text"],
+body.dark-theme .habit-input-section select,
+body.dark-theme .habit-input-section input[type="date"] {
+    background-color: #4a4a4a;
+    border-color: #666;
+    color: #f0f0f0;
+}
+
+body.dark-theme .tracker-grid {
+    border-color: #555;
+}
+
+body.dark-theme .grid-header {
+    background-color: #4a4a4a;
+    border-bottom-color: #555;
+    color: #f0f0f0;
+}
+
+body.dark-theme .habit-label,
+body.dark-theme .date-column,
+body.dark-theme .habit-name,
+body.dark-theme .checkbox-cell {
+    border-right-color: #555;
+}
+
+body.dark-theme .habit-row {
+    border-bottom-color: #555;
+}
+
+body.dark-theme .habit-action-icon {
+    color: #bbb;
+}
+
+body.dark-theme .habit-action-icon:hover {
+    color: #ddd;
+}
+
+body.dark-theme .today-column {
+    background-color: #01579b; /* Darker blue for today in dark mode */
+    color: #e0f2f7;
+}
