@@ -1,60 +1,60 @@
 /* --- Root Variables for Theming (Shadcn/UI Inspired Color Palette) --- */
 :root {
-    /* Base Colors - Light Theme */
-    --background: #FBFBFB; /* Very light grey, almost white */
-    --foreground: #262626; /* Dark grey for text */
-    --card: #FFFFFF; /* Pure white for major cards/sections */
-    --card-foreground: #262626; /* Text on cards */
-    --popover: #FFFFFF; /* For message boxes, etc. */
+    /* Light Theme Colors */
+    --background: #FBFBFB;
+    --foreground: #262626;
+    --card: #FFFFFF;
+    --card-foreground: #262626;
+    --popover: #FFFFFF;
     --popover-foreground: #262626;
-    --primary: #8B5CF6; /* A softer, slightly desaturated purple for main accents */
-    --primary-foreground: #FFFFFF; /* White text on primary elements */
-    --secondary: #EDE9FE; /* A very light, almost white purple/lavender for buttons */
-    --secondary-foreground: #6D28D9; /* A darker, more saturated purple for text on secondary buttons */
-    --muted: #F3F4F6; /* Lightest grey for subtle backgrounds/disabled states */
-    --muted-foreground: #6B7280; /* Muted grey text */
-    --accent: #E0E7FF; /* Light blue-purple pastel for hover/active states */
+    --primary: #8B5CF6;
+    --primary-foreground: #FFFFFF;
+    --secondary: #EDE9FE;
+    --secondary-foreground: #6D28D9;
+    --muted: #F3F4F6;
+    --muted-foreground: #6B7280;
+    --accent: #E0E7FF;
     --accent-foreground: #262626;
-    --border: #E5E7EB; /* Light grey border */
-    --input: #D1D5DB; /* Slightly darker grey for input border */
-    --ring: #8B5CF6; /* Primary color for focus ring */
+    --border: #E5E7EB;
+    --input: #D1D5DB;
+    --ring: #8B5CF6;
 
     /* Specific UI Colors */
-    --success-bg: #D1FAE5; /* Light green pastel for success */
-    --success-text: #065F46; /* Dark green text */
-    --error-bg: #FEE2E2; /* Light red pastel for error */
-    --error-text: #991B1B; /* Dark red text */
-    --streak-color: #FBBF24; /* Amber for streak icon */
-    --streak-text: #78350F; /* Dark brown for streak number */
-    --overlay-color: rgba(0, 0, 0, 0.4); /* Darker overlay */
+    --success-bg: #D1FAE5;
+    --success-text: #065F46;
+    --error-bg: #FEE2E2;
+    --error-text: #991B1B;
+    --streak-color: #FBBF24;
+    --streak-text: #78350F;
+    --overlay-color: rgba(0, 0, 0, 0.4);
 }
 
 /* --- Dark Theme Overrides --- */
 body.dark-theme {
-    --background: #171717; /* Dark charcoal */
-    --foreground: #E0E0E0; /* Light grey text */
-    --card: #262626; /* Darker charcoal for cards/sections */
+    --background: #171717;
+    --foreground: #E0E0E0;
+    --card: #262626;
     --card-foreground: #E0E0E0;
     --popover: #262626;
     --popover-foreground: #E0E0E0;
-    --primary: #A78BFA; /* A slightly lighter, more visible purple for dark mode accents */
+    --primary: #A78BFA;
     --primary-foreground: #FFFFFF;
-    --secondary: #4C1D95; /* A deeper, but still soft, purple for buttons */
-    --secondary-foreground: #DDAAFF; /* A light, soft purple for text on secondary buttons */
-    --muted: #3F3F46; /* Dark grey for subtle backgrounds */
-    --muted-foreground: #A0A0A0; /* Medium light grey text */
-    --accent: #52525B; /* Darker grey for hover/active */
+    --secondary: #4C1D95;
+    --secondary-foreground: #DDAAFF;
+    --muted: #3F3F46;
+    --muted-foreground: #A0A0A0;
+    --accent: #52525B;
     --accent-foreground: #E0E0E0;
-    --border: #52525B; /* Dark grey border */
-    --input: #71717A; /* Darker input border */
+    --border: #52525B;
+    --input: #71717A;
     --ring: #A78BFA;
 
     /* Specific UI Colors - Dark Theme */
-    --success-bg: #10B981; /* Brighter green for dark mode success */
+    --success-bg: #10B981;
     --success-text: #FFFFFF;
-    --error-bg: #DC2626; /* Brighter red for dark mode error */
+    --error-bg: #DC2626;
     --error-text: #FFFFFF;
-    --streak-color: #FCD34D; /* Lighter amber for dark mode streak */
+    --streak-color: #FCD34D;
     --streak-text: #1A1A1A;
     --overlay-color: rgba(0, 0, 0, 0.7);
 }
@@ -137,7 +137,7 @@ body {
 .habit-input-section button,
 .navigation-buttons button {
     padding: 10px 20px;
-    background-color: var(--secondary); /* Uses --secondary for all these buttons */
+    background-color: var(--secondary);
     color: var(--secondary-foreground);
     border: none;
     border-radius: 4px;
@@ -364,27 +364,27 @@ body.disable-interactions main.container {
 
 .habit-action-icon {
     font-size: 0.85em;
-    color: var(--muted-foreground); /* Default subtle color for icons */
+    color: var(--muted-foreground); /* Subtle color for icons */
     cursor: pointer;
     transition: color 0.2s ease, transform 0.1s ease;
     flex-shrink: 0;
 }
 
 .habit-action-icon:hover {
-    color: var(--primary); /* Primary accent on hover for edit */
+    color: var(--primary); /* Primary accent on hover */
     transform: scale(1.1);
 }
 
 .edit-icon:hover {
-    color: var(--primary); /* Explicitly set for edit icon hover */
+    color: var(--primary);
 }
 
 .delete-icon {
-    color: var(--muted-foreground); /* Default error color for delete icon */
+    color: var(--muted-foreground);
 }
 
 .delete-icon:hover {
-    color: var(--primary); /* Lighter error color on hover for delete icon */
+    color: var(--primary);
 }
 
 .edit-habit-input {
@@ -525,7 +525,7 @@ body.dark-theme .today-column {
     color: var(--secondary-foreground);
 }
 
-/* Styles for Streak Display */
+/* Streak Display Styles */
 .streak-container {
     display: flex;
     align-items: center;
@@ -556,7 +556,7 @@ body.dark-theme .streak-number {
     color: inherit;
 }
 
-/* Motivational Quote Section */
+/* Motivational Quote Section Styles */
 .quote-section {
     text-align: center;
     margin-top: 60px;
@@ -665,7 +665,7 @@ body.dark-theme .quote-author {
 .app-footer a {
     color: var(--foreground);
     text-decoration: none;
-    font-weight: bold; /* Set to bold by default */
+    font-weight: bold;
     transition: color 0.2s ease, transform 0.2s ease;
     display: inline-block;
 }
@@ -694,8 +694,7 @@ body.dark-theme .app-footer a:hover {
     filter: brightness(1.2);
 }
 
-
-/* Go to Top Button */
+/* Go to Top Button Styles */
 .go-to-top-button {
     position: fixed;
     bottom: 20px;
@@ -741,13 +740,9 @@ body.dark-theme .go-to-top-button:hover {
     filter: brightness(1.2);
 }
 
-
 /* Media Queries for Responsiveness */
 
-/* Large screens (1441px and up) - Default behavior */
-/* The .tracker-grid default styles are for these screens */
-
-/* Medium screens (up to 1440px, including your 1440x953 laptop and 1024x810 display) */
+/* Medium screens */
 @media (max-width: 1440px) {
     .container {
         width: calc(100% - 20px);
@@ -796,7 +791,7 @@ body.dark-theme .go-to-top-button:hover {
     }
 }
 
-/* Tablet screens (up to 768px, including your 768x810 tablet) */
+/* Tablet screens */
 @media (max-width: 768px) {
     body {
         padding: 0;
@@ -865,7 +860,7 @@ body.dark-theme .go-to-top-button:hover {
     }
 }
 
-/* Mobile screens (up to 480px, including your 425x810 phone) */
+/* Mobile screens */
 @media (max-width: 480px) {
     .tracker-grid {
         min-width: 900px;
