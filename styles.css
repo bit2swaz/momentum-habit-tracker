@@ -6,6 +6,8 @@ body {
     padding: 20px;
     background-color: #f4f4f4;
     color: #333;
+    /* Ensure no horizontal scrollbar from body itself */
+    overflow-x: hidden;
 }
 
 .app-header {
@@ -25,17 +27,20 @@ body {
 }
 
 .container {
-    max-width: 1000px; /* User's updated value */
+    /* Removed max-width: 1000px; to allow it to be more fluid */
+    width: 95%; /* Use percentage for fluid width */
+    max-width: 1000px; /* Still set a max-width for very large screens */
     margin: 0 auto;
     background-color: #fff;
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-sizing: border-box; /* Include padding in the width calculation */
 }
 
 .habit-input-section {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
     gap: 15px;
     margin-bottom: 30px;
     align-items: center;
@@ -48,7 +53,8 @@ body {
     border: 1px solid #ddd;
     border-radius: 4px;
     flex-grow: 1;
-    min-width: 150px;
+    min-width: 150px; /* Ensure inputs don't become too small */
+    box-sizing: border-box; /* Include padding in width */
 }
 
 .habit-input-section button {
@@ -60,6 +66,7 @@ body {
     cursor: pointer;
     font-size: 1em;
     transition: background-color 0.2s ease;
+    flex-shrink: 0; /* Prevent button from shrinking too much */
 }
 
 .habit-input-section button:hover {
@@ -70,20 +77,32 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap; /* Allow label and select/input to wrap */
+    flex-grow: 1; /* Allow duration controls to take space */
+}
+
+/* NEW: Wrapper for horizontal scrolling of the tracker grid */
+.habit-tracker-display {
+    overflow-x: auto; /* Enable horizontal scrolling when content overflows */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    padding-bottom: 10px; /* Add some padding for scrollbar visibility */
 }
 
 .tracker-grid {
     display: grid;
-    grid-template-columns: 1.5fr repeat(7, 1fr);
+    /* Min-width ensures the grid itself maintains enough width for its content */
+    /* This will cause overflow-x: auto on .habit-tracker-display */
+    grid-template-columns: minmax(180px, 1.5fr) repeat(7, minmax(100px, 1fr)); /* Adjusted column sizes */
     border: 1px solid #eee;
     border-radius: 6px;
-    min-width: 960px; /* User's updated value */
+    /* Removed fixed min-width: 960px; as it's now handled by minmax and overflow-x */
+    min-width: 880px; /* Set a reasonable minimum width for the grid to ensure dates fit */
 }
 
 .grid-header,
 .habit-list,
 .habit-row {
-    display: contents;
+    display: contents; /* Allows children to be direct grid items */
 }
 
 .grid-header {
@@ -100,6 +119,7 @@ body {
     padding: 15px;
     text-align: left;
     border-right: 1px solid #eee;
+    white-space: nowrap; /* Prevent "Habit" label itself from wrapping */
 }
 
 .date-column {
@@ -107,9 +127,9 @@ body {
     padding: 15px 5px;
     border-right: 1px solid #eee;
     font-size: 0.8em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: nowrap; /* Keep date on one line */
+    overflow: hidden; /* Hide overflow if it still happens (less likely now) */
+    text-overflow: ellipsis; /* Show ellipsis if hidden */
 }
 
 .date-column:last-child {
@@ -131,16 +151,16 @@ body {
     text-align: left;
     border-right: 1px solid #eee;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Allow content to wrap to next line */
     align-items: center;
-    gap: 8px;
+    gap: 8px; /* Space between elements */
     position: relative;
 }
 
 .habit-name span {
-    flex-grow: 1;
-    min-width: 0;
-    word-break: break-word;
+    flex-grow: 1; /* Allow the text span to grow and take available space */
+    min-width: 0; /* Important for flex items to shrink below their content size */
+    word-break: break-word; /* Ensure long words break if necessary */
 }
 
 .checkbox-cell {
@@ -158,6 +178,10 @@ body {
 .navigation-buttons {
     text-align: center;
     margin-bottom: 20px;
+    display: flex; /* Make buttons flex container */
+    flex-wrap: wrap; /* Allow buttons to wrap */
+    justify-content: center; /* Center buttons */
+    gap: 10px; /* Space between buttons */
 }
 
 .navigation-buttons button {
@@ -167,8 +191,9 @@ body {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin: 0 5px;
+    margin: 0; /* Remove old margin as gap handles it */
     transition: background-color 0.2s ease;
+    flex-shrink: 0; /* Prevent buttons from shrinking too much */
 }
 
 .navigation-buttons button:hover {
@@ -438,50 +463,14 @@ body.dark-theme .today-column {
 .streak-container {
     display: flex;
     align-items: center;
-    gap: 4px; 
-    margin-left: 8px;
-    flex-shrink: 0;
-    opacity: 0; 
-    transform: scale(0.8); 
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    gap: 4px; /* Space between fire icon and number */
+    margin-left: 8px; /* Push streak container away from habit name text */
+    flex-shrink: 0; /* Prevent it from shrinking */
+    opacity: 1; /* Keep visible by default now */
+    transform: scale(1); /* Keep at normal size by default now */
+    transition: none; /* Remove initial animation for now */
+    animation: none; /* Remove animation for now */
 }
-
-/* Animation for the fire icon */
-@keyframes fire-flicker {
-    0% {
-        opacity: 0.8;
-        transform: scale(1);
-        filter: brightness(100%);
-    }
-    25% {
-        opacity: 1;
-        transform: scale(1.05);
-        filter: brightness(120%);
-    }
-    50% {
-        opacity: 0.9;
-        transform: scale(1);
-        filter: brightness(100%);
-    }
-    75% {
-        opacity: 1;
-        transform: scale(1.03);
-        filter: brightness(110%);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-        filter: brightness(100%);
-    }
-}
-
-.streak-container.animate-in {
-    opacity: 1;
-    transform: scale(1);
-    animation: fire-flicker 1.5s ease-out forwards; /* Apply animation */
-    /* forwards: retains the styles from the last keyframe when the animation ends */
-}
-
 
 .streak-icon {
     color: #ff9800; /* Orange/fire color */
@@ -497,4 +486,122 @@ body.dark-theme .today-column {
 
 body.dark-theme .streak-number {
     color: #f0f0f0;
+}
+
+/* Media Queries for Responsiveness */
+
+/* Small screens (e.g., mobile phones) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px; /* Reduce overall padding */
+    }
+
+    .app-title {
+        font-size: 2em; /* Smaller title on mobile */
+    }
+
+    .app-description {
+        font-size: 1em; /* Smaller description */
+    }
+
+    .container {
+        width: 98%; /* Take up more width on smaller screens */
+        padding: 15px; /* Reduce container padding */
+    }
+
+    .habit-input-section {
+        flex-direction: column; /* Stack input elements vertically */
+        align-items: stretch; /* Stretch items to full width */
+    }
+
+    .habit-input-section input[type="text"],
+    .habit-input-section select,
+    .habit-input-section input[type="date"],
+    .habit-input-section button {
+        width: 100%; /* Full width for inputs and buttons */
+        min-width: unset; /* Remove min-width constraint */
+    }
+
+    .duration-controls {
+        flex-direction: column; /* Stack duration controls */
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .duration-controls label,
+    .duration-controls select,
+    .duration-controls input[type="date"] {
+        width: 100%;
+    }
+
+    .navigation-buttons {
+        flex-direction: column; /* Stack navigation buttons */
+        gap: 8px;
+    }
+
+    .navigation-buttons button {
+        width: 100%; /* Full width for navigation buttons */
+    }
+
+    /* Tracker Grid adjustments for small screens */
+    .tracker-grid {
+        /* Keep min-width for horizontal scrolling */
+        min-width: 600px; /* Adjust this value as needed to ensure readability on smallest screens */
+        /* The habit-tracker-display will handle overflow-x: auto */
+        grid-template-columns: minmax(120px, 1fr) repeat(7, minmax(60px, 1fr)); /* Adjust column sizes for mobile */
+    }
+
+    .habit-label,
+    .date-column {
+        padding: 10px 3px; /* Reduce padding in grid header cells */
+        font-size: 0.75em; /* Further reduce font size for dates */
+    }
+
+    .habit-name {
+        padding: 8px 10px; /* Reduce padding in habit name cells */
+        font-size: 0.9em; /* Adjust habit name font size */
+        flex-wrap: wrap; /* Ensure wrapping */
+        align-items: flex-start; /* Align items to top if wrapped */
+    }
+
+    .habit-name span {
+        flex-basis: 100%; /* Habit name text takes full width */
+        margin-bottom: 4px; /* Space between name and icons/streak */
+    }
+
+    .streak-container {
+        margin-left: 0; /* Remove left margin, let flex gap handle it */
+        margin-top: 4px; /* Add some top margin if it wraps */
+        flex-basis: auto; /* Allow it to take natural width */
+    }
+
+    .edit-icon, .delete-icon {
+        margin-left: 4px; /* Add a small margin between icons */
+    }
+
+    .checkbox-cell {
+        padding: 8px 3px; /* Reduce padding in checkbox cells */
+    }
+}
+
+/* Medium screens (e.g., tablets in portrait) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        width: 90%; /* Slightly less width than full desktop */
+    }
+
+    .tracker-grid {
+        min-width: 760px; /* Adjust min-width for tablets */
+        grid-template-columns: minmax(150px, 1.5fr) repeat(7, minmax(80px, 1fr));
+    }
+
+    .habit-label,
+    .date-column {
+        padding: 12px 5px;
+        font-size: 0.8em;
+    }
+
+    .habit-name {
+        padding: 10px 12px;
+    }
 }
