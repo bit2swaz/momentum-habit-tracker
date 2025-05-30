@@ -41,6 +41,7 @@ function getMondayOfWeek(date) {
 function renderDates() {
     const gridHeader = document.querySelector('.grid-header');
     
+    // Remove all existing date columns except the first 'Habit' header
     while (gridHeader.children.length > 1) {
         gridHeader.removeChild(gridHeader.lastChild);
     }
@@ -61,8 +62,13 @@ function renderDates() {
         dateColumn.classList.add('date-column');
         dateColumn.dataset.fullDate = formatDate(date);
 
-        const options = { weekday: 'short', month: 'short', day: 'numeric' };
-        dateColumn.textContent = date.toLocaleDateString('en-US', options);
+        // UPDATED: Removed year from options, will append manually
+        const options = { weekday: 'short', month: 'short', day: 'numeric' }; 
+        const formattedDate = date.toLocaleDateString('en-US', options);
+        const yearTwoDigit = date.getFullYear().toString().slice(-2); // Get last two digits of year
+
+        // Combine formatted date with apostrophe and two-digit year
+        dateColumn.textContent = `${formattedDate}, '${yearTwoDigit}`;
 
         if (date.toDateString() === today.toDateString()) {
             dateColumn.classList.add('today-column');
@@ -358,18 +364,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to apply the saved theme or default to light
     function applyTheme() {
         const savedTheme = localStorage.getItem('theme');
-        // Check if the body currently has the dark-theme class
         const isBodyDark = document.body.classList.contains('dark-theme');
 
         if (savedTheme === 'dark') {
-            // If saved theme is dark AND body is not dark, add the class
             if (!isBodyDark) {
                 document.body.classList.add('dark-theme');
             }
             themeIcon.classList.remove('fa-sun');
             themeIcon.classList.add('fa-moon');
-        } else { // savedTheme is 'light' or null/undefined
-            // If saved theme is light/none AND body is dark, remove the class
+        } else {
             if (isBodyDark) {
                 document.body.classList.remove('dark-theme');
             }
@@ -380,11 +383,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event listener for theme toggle button
     themeToggleButton.addEventListener('click', () => {
-        // Toggle the dark-theme class on the body and get its new state
         const isDark = document.body.classList.toggle('dark-theme');
-        console.log('Toggling theme. isDark:', isDark); // Debugging log
-
-        // Update localStorage and icon based on the new state
+        
         if (isDark) {
             localStorage.setItem('theme', 'dark');
             themeIcon.classList.remove('fa-sun');
@@ -395,11 +395,10 @@ document.addEventListener('DOMContentLoaded', () => {
             themeIcon.classList.add('fa-sun');
         }
 
-        // Add/remove rotated class for animation
-        themeToggleButton.classList.add('rotated'); // Always add to trigger animation
+        themeToggleButton.classList.add('rotated');
         setTimeout(() => {
             themeToggleButton.classList.remove('rotated');
-        }, 500); // Match CSS transition duration
+        }, 500);
     });
 
     // Event listener for duration select to show/hide custom date input.

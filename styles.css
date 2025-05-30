@@ -72,12 +72,13 @@ body {
     gap: 10px;
 }
 
+/* UPDATED: tracker-grid min-width */
 .tracker-grid {
     display: grid;
     grid-template-columns: 1.5fr repeat(7, 1fr);
     border: 1px solid #eee;
     border-radius: 6px;
-    min-width: 650px;
+    min-width: 800px; /* Increased min-width to provide more space for dates */
 }
 
 .grid-header,
@@ -102,11 +103,15 @@ body {
     border-right: 1px solid #eee;
 }
 
+/* UPDATED: date-column font size and white-space */
 .date-column {
     text-align: center;
     padding: 15px 5px;
     border-right: 1px solid #eee;
-    font-size: 0.9em;
+    font-size: 0.8em; /* Keep reduced font size */
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide overflow if text is still too long */
+    text-overflow: ellipsis; /* Add ellipsis if text is hidden */
 }
 
 .date-column:last-child {
@@ -320,66 +325,60 @@ body.disable-interactions main.container {
     border-radius: 4px;
 }
 
-/* NEW: Styles for the theme toggle button container */
 .theme-toggle-container {
-    position: fixed; /* Fixed position relative to the viewport */
-    top: 20px; /* 20px from the top */
-    right: 20px; /* 20px from the right */
-    z-index: 100; /* Ensure it's above most content */
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
 }
 
-/* NEW: Styles for the theme toggle button (the clickable circle) */
 .theme-toggle-button {
-    background-color: transparent; /* Blends with body initially */
-    border: 2px solid transparent; /* Invisible border for hover effect */
-    border-radius: 50%; /* Make it circular */
-    width: 44px; /* Size of the circular button */
-    height: 44px; /* Size of the circular button */
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    padding: 0; /* Remove default button padding */
+    padding: 0;
     transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
-    -webkit-appearance: none; /* Remove default button styles for cross-browser consistency */
+    -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
 }
 
 .theme-toggle-button:hover {
-    background-color: rgba(0, 0, 0, 0.05); /* Subtle background on hover (light theme) */
-    border-color: #ccc; /* Border appears on hover */
-    transform: scale(1.1); /* Slight scale on hover */
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: #ccc;
+    transform: scale(1.1);
 }
 
-/* NEW: Styles for the icon inside the button */
 .theme-toggle-button #themeIcon {
-    font-size: 1.5em; /* Icon size */
-    color: #777; /* Default icon color for light theme */
-    transition: transform 0.5s ease-out, color 0.3s ease; /* Smooth rotation and color change */
+    font-size: 1.5em;
+    color: #777;
+    transition: transform 0.5s ease-out, color 0.3s ease;
 }
 
-/* Dark theme specific styles for the toggle button and icon */
 body.dark-theme .theme-toggle-button {
-    background-color: transparent; /* Blends with dark body */
+    background-color: transparent;
     border-color: transparent;
 }
 
 body.dark-theme .theme-toggle-button:hover {
-    background-color: rgba(255, 255, 255, 0.1); /* Subtle background on hover (dark theme) */
-    border-color: #888; /* Border appears on hover */
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #888;
 }
 
 body.dark-theme .theme-toggle-button #themeIcon {
-    color: #f0f0f0; /* Lighter color for dark theme */
+    color: #f0f0f0;
 }
 
-/* Class for rotation effect (added/removed by JS) */
 .theme-toggle-button.rotated #themeIcon {
-    transform: rotate(360deg); /* Full rotation */
+    transform: rotate(360deg);
 }
 
-/* Dark theme specific overrides for elements */
 body.dark-theme {
     background-color: #2c2c2c;
     color: #f0f0f0;
@@ -434,6 +433,6 @@ body.dark-theme .habit-action-icon:hover {
 }
 
 body.dark-theme .today-column {
-    background-color: #01579b; /* Darker blue for today in dark mode */
+    background-color: #01579b;
     color: #e0f2f7;
 }
