@@ -27,7 +27,6 @@ body {
 }
 
 .container {
-    /* Removed max-width: 1000px; to allow it to be more fluid */
     width: 95%; /* Use percentage for fluid width */
     max-width: 1000px; /* Still set a max-width for very large screens */
     margin: 0 auto;
@@ -81,7 +80,7 @@ body {
     flex-grow: 1; /* Allow duration controls to take space */
 }
 
-/* NEW: Wrapper for horizontal scrolling of the tracker grid */
+/* Wrapper for horizontal scrolling of the tracker grid */
 .habit-tracker-display {
     overflow-x: auto; /* Enable horizontal scrolling when content overflows */
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
@@ -90,13 +89,12 @@ body {
 
 .tracker-grid {
     display: grid;
-    /* Min-width ensures the grid itself maintains enough width for its content */
-    /* This will cause overflow-x: auto on .habit-tracker-display */
-    grid-template-columns: minmax(180px, 1.5fr) repeat(7, minmax(100px, 1fr)); /* Adjusted column sizes */
+    /* Default for larger screens: Flexible columns, no fixed min-width here */
+    /* This allows the grid to shrink with the container on desktop without scrollbars */
+    grid-template-columns: 1.5fr repeat(7, 1fr); 
     border: 1px solid #eee;
     border-radius: 6px;
-    /* Removed fixed min-width: 960px; as it's now handled by minmax and overflow-x */
-    min-width: 880px; /* Set a reasonable minimum width for the grid to ensure dates fit */
+    /* Removed min-width for desktop, it will be added in media queries for smaller screens */
 }
 
 .grid-header,
@@ -150,7 +148,7 @@ body {
     padding: 10px 15px;
     text-align: left;
     border-right: 1px solid #eee;
-    display: flex;
+    display: flex; /* Keep flex for alignment */
     flex-wrap: wrap; /* Allow content to wrap to next line */
     align-items: center;
     gap: 8px; /* Space between elements */
@@ -490,7 +488,55 @@ body.dark-theme .streak-number {
 
 /* Media Queries for Responsiveness */
 
-/* Small screens (e.g., mobile phones) */
+/* Adjustments for screens up to 1024px (tablets and smaller laptops) */
+@media (max-width: 1024px) {
+    .container {
+        width: 98%; /* Take up more width on smaller screens */
+        padding: 15px; /* Reduce container padding */
+    }
+
+    /* Tracker Grid adjustments for screens up to 1024px */
+    .tracker-grid {
+        /* Set a min-width for the overall grid here, which will trigger overflow-x: auto */
+        min-width: 780px; /* Increased min-width to ensure dates fit comfortably */
+        /* Adjusted minmax values for columns to ensure dates are visible without ellipsis */
+        grid-template-columns: minmax(150px, 1.5fr) repeat(7, minmax(85px, 1fr)); 
+    }
+
+    .habit-label,
+    .date-column {
+        padding: 10px 3px; /* Reduce padding in grid header cells */
+        font-size: 0.75em; /* Further reduce font size for dates */
+    }
+
+    .habit-name {
+        padding: 8px 10px; /* Reduce padding in habit name cells */
+        font-size: 0.9em; /* Adjust habit name font size */
+        flex-wrap: wrap; /* Ensure wrapping */
+        align-items: flex-start; /* Align items to top if wrapped */
+    }
+
+    .habit-name span {
+        flex-basis: 100%; /* Habit name text takes full width */
+        margin-bottom: 4px; /* Space between name and icons/streak */
+    }
+
+    .streak-container {
+        margin-left: 0; /* Remove left margin, let flex gap handle it */
+        margin-top: 4px; /* Add some top margin if it wraps */
+        flex-basis: auto; /* Allow it to take natural width */
+    }
+
+    .edit-icon, .delete-icon {
+        margin-left: 4px; /* Add a small margin between icons */
+    }
+
+    .checkbox-cell {
+        padding: 8px 3px; /* Reduce padding in checkbox cells */
+    }
+}
+
+/* Further adjustments for very small screens (e.g., mobile phones) */
 @media (max-width: 768px) {
     body {
         padding: 10px; /* Reduce overall padding */
@@ -502,11 +548,6 @@ body.dark-theme .streak-number {
 
     .app-description {
         font-size: 1em; /* Smaller description */
-    }
-
-    .container {
-        width: 98%; /* Take up more width on smaller screens */
-        padding: 15px; /* Reduce container padding */
     }
 
     .habit-input-section {
@@ -543,65 +584,9 @@ body.dark-theme .streak-number {
         width: 100%; /* Full width for navigation buttons */
     }
 
-    /* Tracker Grid adjustments for small screens */
+    /* Tracker Grid adjustments for very small screens */
     .tracker-grid {
-        /* Keep min-width for horizontal scrolling */
-        min-width: 600px; /* Adjust this value as needed to ensure readability on smallest screens */
-        /* The habit-tracker-display will handle overflow-x: auto */
-        grid-template-columns: minmax(120px, 1fr) repeat(7, minmax(60px, 1fr)); /* Adjust column sizes for mobile */
-    }
-
-    .habit-label,
-    .date-column {
-        padding: 10px 3px; /* Reduce padding in grid header cells */
-        font-size: 0.75em; /* Further reduce font size for dates */
-    }
-
-    .habit-name {
-        padding: 8px 10px; /* Reduce padding in habit name cells */
-        font-size: 0.9em; /* Adjust habit name font size */
-        flex-wrap: wrap; /* Ensure wrapping */
-        align-items: flex-start; /* Align items to top if wrapped */
-    }
-
-    .habit-name span {
-        flex-basis: 100%; /* Habit name text takes full width */
-        margin-bottom: 4px; /* Space between name and icons/streak */
-    }
-
-    .streak-container {
-        margin-left: 0; /* Remove left margin, let flex gap handle it */
-        margin-top: 4px; /* Add some top margin if it wraps */
-        flex-basis: auto; /* Allow it to take natural width */
-    }
-
-    .edit-icon, .delete-icon {
-        margin-left: 4px; /* Add a small margin between icons */
-    }
-
-    .checkbox-cell {
-        padding: 8px 3px; /* Reduce padding in checkbox cells */
-    }
-}
-
-/* Medium screens (e.g., tablets in portrait) */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .container {
-        width: 90%; /* Slightly less width than full desktop */
-    }
-
-    .tracker-grid {
-        min-width: 760px; /* Adjust min-width for tablets */
-        grid-template-columns: minmax(150px, 1.5fr) repeat(7, minmax(80px, 1fr));
-    }
-
-    .habit-label,
-    .date-column {
-        padding: 12px 5px;
-        font-size: 0.8em;
-    }
-
-    .habit-name {
-        padding: 10px 12px;
+        min-width: 650px; /* Ensure a comfortable minimum width for dates on smallest phones */
+        grid-template-columns: minmax(120px, 1fr) repeat(7, minmax(70px, 1fr)); /* Adjusted min-width for date columns */
     }
 }
