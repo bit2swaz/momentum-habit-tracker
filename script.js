@@ -17,19 +17,19 @@ function getEffectiveYesterday() {
 }
 
 function loadHabits() {
-  const storedHabits = localStorage.getItem('habits');
-  if (storedHabits) {
-    try {
-      habits = JSON.parse(storedHabits);
-    } catch (e) {
-      console.error('Error parsing habits from localStorage:', e);
-      habits = [];
+    const storedHabits = localStorage.getItem('habits');
+    if (storedHabits) {
+        try {
+            habits = JSON.parse(storedHabits);
+        } catch (e) {
+            console.error('Error parsing habits from localStorage:', e);
+            habits = [];
+        }
     }
-  }
 }
 
 function saveHabits() {
-  localStorage.setItem('habits', JSON.stringify(habits));
+    localStorage.setItem('habits', JSON.stringify(habits));
 }
 
 function formatDate(date) {
@@ -50,7 +50,6 @@ function getMondayOfWeek(date) {
 
 function renderDates() {
     const gridHeader = document.querySelector('.grid-header');
-    
     while (gridHeader.children.length > 1) {
         gridHeader.removeChild(gridHeader.lastChild);
     }
@@ -70,7 +69,7 @@ function renderDates() {
         dateColumn.classList.add('date-column');
         dateColumn.dataset.fullDate = formatDate(date);
 
-        const options = { weekday: 'short', month: 'short', day: 'numeric' }; 
+        const options = { weekday: 'short', month: 'short', day: 'numeric' };
         const formattedDate = date.toLocaleDateString('en-US', options);
         const yearTwoDigit = date.getFullYear().toString().slice(-2);
 
@@ -79,7 +78,6 @@ function renderDates() {
         if (date.toDateString() === today.toDateString()) {
             dateColumn.classList.add('today-column');
         }
-
         gridHeader.appendChild(dateColumn);
     });
 }
@@ -210,9 +208,7 @@ function editHabit(habitId, currentNameDiv) {
         const newName = inputField.value.trim();
         if (newName === '') {
             showCustomMessageBox('Habit name cannot be empty! Reverting to original name.');
-            targetHabit.name = targetHabit.name;
-            saveHabits();
-            renderHabits();
+            currentNameDiv.textContent = targetHabit.name; 
             return;
         }
         targetHabit.name = newName;
@@ -288,7 +284,6 @@ function calculateStreak(habit) {
             break; 
         }
     }
-
     return streak;
 }
 
@@ -446,9 +441,10 @@ function renderHabits() {
             
             habitRow.appendChild(checkboxCell);
         });
-
         habitList.appendChild(habitRow);
     });
+    // Call the visibility update after habits are rendered
+    updateGoToTopButtonVisibility();
 }
 
 const motivationalQuotes = [
@@ -478,27 +474,44 @@ function displayRandomQuote() {
         const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
         const fullQuote = motivationalQuotes[randomIndex];
 
-        // Split the quote from the attribution (assuming " – " is the delimiter)
         const parts = fullQuote.split(' – ');
         const quoteText = parts[0] || '';
-        const quoteAuthor = parts.length > 1 ? `– ${parts[1]}` : ''; // Re-add the dash for the author
+        const quoteAuthor = parts.length > 1 ? `– ${parts[1]}` : '';
 
-        // Clear previous content
         quoteElement.innerHTML = '';
 
-        // Create span for quote text
         const quoteTextSpan = document.createElement('span');
         quoteTextSpan.classList.add('quote-text');
         quoteTextSpan.textContent = quoteText;
         quoteElement.appendChild(quoteTextSpan);
 
-        // Create span for author, if available
         if (quoteAuthor) {
             const quoteAuthorSpan = document.createElement('span');
             quoteAuthorSpan.classList.add('quote-author');
             quoteAuthorSpan.textContent = quoteAuthor;
             quoteElement.appendChild(quoteAuthorSpan);
         }
+    }
+}
+
+let goToTopBtn;
+let habitTrackerDisplayElement; // Reference to the main habit tracker section
+
+function updateGoToTopButtonVisibility() {
+    if (!goToTopBtn || !habitTrackerDisplayElement) {
+        return; // Exit if elements are not found
+    }
+
+    // The button should only show if there are habits AND the habit tracker section
+    // has scrolled out of view (its top is above the viewport's top).
+    const rect = habitTrackerDisplayElement.getBoundingClientRect();
+    
+    // We check if the top of the habit tracker display is above the viewport (rect.top < 0)
+    // AND if there's actual content (habits.length > 0) that would necessitate scrolling.
+    if (habits.length > 0 && rect.top < 0) {
+        goToTopBtn.classList.add('show');
+    } else {
+        goToTopBtn.classList.remove('show');
     }
 }
 
@@ -512,7 +525,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentWeekBtn = document.getElementById('currentWeekBtn');
     const themeToggleButton = document.getElementById('themeToggleButton');
     const themeIcon = document.getElementById('themeIcon');
-    const goToTopBtn = document.getElementById('goToTopBtn');
+
+    // Assign global variables on DOMContentLoaded
+    goToTopBtn = document.getElementById('goToTopBtn');
+    habitTrackerDisplayElement = document.querySelector('.habit-tracker-display');
 
     function applyTheme() {
         const savedTheme = localStorage.getItem('theme');
@@ -613,14 +629,14 @@ document.addEventListener('DOMContentLoaded', () => {
         habitDurationSelect.value = 'forever';
         customEndDateInput.style.display = 'none';
 
-        renderHabits();
+        renderHabits(); // This will now trigger updateGoToTopButtonVisibility
     });
 
     loadHabits();
     applyTheme();
     currentWeekStart = getMondayOfWeek(getEffectiveToday());
     renderDates();
-    renderHabits();
+    renderHabits(); // Initial render and button visibility check
     customEndDateInput.style.display = 'none';
 
     prevWeekBtn.addEventListener('click', () => {
@@ -641,13 +657,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHabits();
     });
 
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) { 
-            goToTopBtn.classList.add('show');
-        } else {
-            goToTopBtn.classList.remove('show');
-        }
-    });
+    // Attach the scroll event listener
+    window.addEventListener('scroll', updateGoToTopButtonVisibility);
 
     goToTopBtn.addEventListener('click', () => {
         window.scrollTo({
@@ -657,4 +668,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     displayRandomQuote();
+
+    // Initial check for button visibility on page load
+    // This is important to set the correct state immediately after the page loads
+    updateGoToTopButtonVisibility();
 });
