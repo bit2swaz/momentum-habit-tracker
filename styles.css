@@ -27,8 +27,8 @@ body {
 }
 
 .container {
-    width: 95%; /* Use percentage for fluid width */
-    max-width: 1000px; /* Still set a max-width for very large screens */
+    width: calc(100% - 40px); /* Take up 100% width minus body padding on each side */
+    max-width: 1400px; /* Increased max-width for very large screens to allow more expansion */
     margin: 0 auto;
     background-color: #fff;
     padding: 30px;
@@ -82,19 +82,18 @@ body {
 
 /* Wrapper for horizontal scrolling of the tracker grid */
 .habit-tracker-display {
-    overflow-x: auto; /* Enable horizontal scrolling when content overflows */
+    overflow-x: hidden; /* Default to hidden on large screens */
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     padding-bottom: 10px; /* Add some padding for scrollbar visibility */
 }
 
 .tracker-grid {
     display: grid;
-    /* Default for larger screens: Flexible columns, no fixed min-width here */
-    /* This allows the grid to shrink with the container on desktop without scrollbars */
-    grid-template-columns: 1.5fr repeat(7, 1fr); 
+    /* Default for very large screens (> 1440px): Flexible columns */
+    grid-template-columns: minmax(250px, 2fr) repeat(7, minmax(130px, 1fr)); 
     border: 1px solid #eee;
     border-radius: 6px;
-    /* Removed min-width for desktop, it will be added in media queries for smaller screens */
+    /* No min-width here; it will expand with the container */
 }
 
 .grid-header,
@@ -117,7 +116,8 @@ body {
     padding: 15px;
     text-align: left;
     border-right: 1px solid #eee;
-    white-space: nowrap; /* Prevent "Habit" label itself from wrapping */
+    white-space: normal; /* Allow habit label to wrap */
+    word-break: break-word; /* Break long words */
 }
 
 .date-column {
@@ -191,11 +191,11 @@ body {
     cursor: pointer;
     margin: 0; /* Remove old margin as gap handles it */
     transition: background-color 0.2s ease;
-    flex-shrink: 0; /* Prevent buttons from shrinking too much */
+    flex-shrink: 0; /* Prevent button from shrinking too much */
 }
 
 .navigation-buttons button:hover {
-    background-color: #6a1b9a;
+    background-color: #4a148c;
 }
 
 .disabled-day {
@@ -347,7 +347,7 @@ body.disable-interactions main.container {
 
 .theme-toggle-container {
     position: fixed;
-    top: 20px;
+    top: 20px; /* Default for larger screens */
     right: 20px;
     z-index: 100;
 }
@@ -488,19 +488,27 @@ body.dark-theme .streak-number {
 
 /* Media Queries for Responsiveness */
 
-/* Adjustments for screens up to 1024px (tablets and smaller laptops) */
-@media (max-width: 1024px) {
+/* Large screens (1441px and up) - Default behavior */
+/* The .tracker-grid default styles are for these screens */
+
+/* Medium screens (up to 1440px, including your 1440x953 laptop and 1024x810 display) */
+@media (max-width: 1440px) {
     .container {
-        width: 98%; /* Take up more width on smaller screens */
-        padding: 15px; /* Reduce container padding */
+        width: calc(100% - 20px); /* Slightly more padding on smaller screens */
+        padding: 20px; /* Reduce container padding */
     }
 
-    /* Tracker Grid adjustments for screens up to 1024px */
+    /* Enable horizontal scrolling for habit-tracker-display on screens <= 1440px */
+    .habit-tracker-display {
+        overflow-x: auto; 
+    }
+
+    /* Tracker Grid adjustments for screens up to 1440px */
     .tracker-grid {
-        /* Set a min-width for the overall grid here, which will trigger overflow-x: auto */
-        min-width: 780px; /* Increased min-width to ensure dates fit comfortably */
+        /* Set a min-width for the overall grid here to ensure dates fit, triggering overflow-x: auto */
+        min-width: 1050px; /* This ensures dates are fully visible and forces scroll on screens smaller than this */
         /* Adjusted minmax values for columns to ensure dates are visible without ellipsis */
-        grid-template-columns: minmax(150px, 1.5fr) repeat(7, minmax(85px, 1fr)); 
+        grid-template-columns: minmax(180px, 1.5fr) repeat(7, minmax(110px, 1fr)); 
     }
 
     .habit-label,
@@ -536,7 +544,7 @@ body.dark-theme .streak-number {
     }
 }
 
-/* Further adjustments for very small screens (e.g., mobile phones) */
+/* Tablet screens (up to 768px, including your 768x810 tablet) */
 @media (max-width: 768px) {
     body {
         padding: 10px; /* Reduce overall padding */
@@ -584,9 +592,35 @@ body.dark-theme .streak-number {
         width: 100%; /* Full width for navigation buttons */
     }
 
-    /* Tracker Grid adjustments for very small screens */
+    /* Tracker Grid adjustments for tablet screens */
     .tracker-grid {
-        min-width: 650px; /* Ensure a comfortable minimum width for dates on smallest phones */
-        grid-template-columns: minmax(120px, 1fr) repeat(7, minmax(70px, 1fr)); /* Adjusted min-width for date columns */
+        /* This min-width will force the horizontal scrollbar on tablets */
+        min-width: 900px; /* Increased to ensure dates fit comfortably on tablets */
+        grid-template-columns: minmax(160px, 1fr) repeat(7, minmax(90px, 1fr)); /* Increased min-width for date columns */
+    }
+
+    /* Theme toggle button adjustment for small screens */
+    .theme-toggle-container {
+        top: 60px; /* Push it down below the app header */
+        right: 10px; /* Adjust right margin for tighter screens */
+    }
+
+    /* Optional: Add some padding to the header to prevent text from being too close to the top */
+    .app-header {
+        padding-top: 20px; /* Add space above the title */
+    }
+}
+
+/* Mobile screens (up to 480px, including your 425x810 phone) */
+@media (max-width: 480px) {
+    .tracker-grid {
+        /* Even smaller min-width for mobile, but still ensuring dates are visible */
+        min-width: 900px; /* Increased to ensure dates fit on smallest phones */
+        grid-template-columns: minmax(120px, 1fr) repeat(7, minmax(80px, 1fr)); /* Increased min-width for date columns */
+    }
+
+    .habit-label,
+    .date-column {
+        font-size: 0.7em; /* Slightly smaller font for very small screens */
     }
 }
