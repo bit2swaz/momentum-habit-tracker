@@ -199,16 +199,20 @@ function editHabit(habitId, currentNameDiv) {
     inputField.classList.add('edit-habit-input');
     inputField.maxLength = 50;
 
+    // Store the original content before replacing
+    const originalContent = currentNameDiv.innerHTML; 
+
     currentNameDiv.innerHTML = '';
     currentNameDiv.appendChild(inputField);
 
     inputField.focus();
 
-    const saveEdit = () => {
+    const saveEdit = async () => { // Made async to await showCustomMessageBox
         const newName = inputField.value.trim();
         if (newName === '') {
-            showCustomMessageBox('Habit name cannot be empty! Reverting to original name.');
-            currentNameDiv.textContent = targetHabit.name; 
+            await showCustomMessageBox('Habit name cannot be empty! Reverting to original name.');
+            // Re-render the habits to bring back the icons
+            renderHabits(); 
             return;
         }
         targetHabit.name = newName;
@@ -524,13 +528,11 @@ document.addEventListener('DOMContentLoaded', () => {
     goToTopBtn = document.getElementById('goToTopBtn');
     habitTrackerDisplayElement = document.querySelector('.habit-tracker-display');
 
-    // MODIFIED: applyTheme function to include system preference detection
     function applyTheme() {
         const savedTheme = localStorage.getItem('theme');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         let themeToApply = savedTheme;
 
-        // If no theme is saved in localStorage, use system preference
         if (themeToApply === null) {
             themeToApply = prefersDark ? 'dark' : 'light';
         }
@@ -630,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     loadHabits();
-    applyTheme(); // Call applyTheme here to set initial theme based on system or saved preference
+    applyTheme();
     currentWeekStart = getMondayOfWeek(getEffectiveToday());
     renderDates();
     renderHabits();
