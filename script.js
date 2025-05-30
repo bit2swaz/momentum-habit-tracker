@@ -476,7 +476,29 @@ function displayRandomQuote() {
     const quoteElement = document.getElementById('motivationalQuote');
     if (quoteElement) {
         const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
-        quoteElement.textContent = motivationalQuotes[randomIndex];
+        const fullQuote = motivationalQuotes[randomIndex];
+
+        // Split the quote from the attribution (assuming " – " is the delimiter)
+        const parts = fullQuote.split(' – ');
+        const quoteText = parts[0] || '';
+        const quoteAuthor = parts.length > 1 ? `– ${parts[1]}` : ''; // Re-add the dash for the author
+
+        // Clear previous content
+        quoteElement.innerHTML = '';
+
+        // Create span for quote text
+        const quoteTextSpan = document.createElement('span');
+        quoteTextSpan.classList.add('quote-text');
+        quoteTextSpan.textContent = quoteText;
+        quoteElement.appendChild(quoteTextSpan);
+
+        // Create span for author, if available
+        if (quoteAuthor) {
+            const quoteAuthorSpan = document.createElement('span');
+            quoteAuthorSpan.classList.add('quote-author');
+            quoteAuthorSpan.textContent = quoteAuthor;
+            quoteElement.appendChild(quoteAuthorSpan);
+        }
     }
 }
 

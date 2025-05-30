@@ -543,7 +543,6 @@ body.dark-theme .go-to-top-button:hover {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     
-    /* NEW: For standalone section layout */
     width: calc(100% - 40px); /* Match body padding */
     max-width: 900px; /* Set a max-width for the quote section */
     margin-left: auto; /* Center the block */
@@ -552,36 +551,58 @@ body.dark-theme .go-to-top-button:hover {
 }
 
 .motivational-quote {
+    /* This paragraph will now contain two spans */
     font-size: 1.25em; /* Slightly larger font for prominence */
     font-style: italic;
     color: #555;
     line-height: 1.6;
     margin: 0; /* Remove default paragraph margin */
-    position: relative; /* Needed for pseudo-elements positioning */
-    padding: 0 20px; /* Add padding to make space for quotes */
+    display: flex; /* Use flexbox to align quote and author */
+    flex-direction: column; /* Stack quote and author vertically */
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically if space allows */
+    position: relative; /* For relative positioning of children if needed */
 }
 
-/* NEW: Quotation Marks using pseudo-elements */
-.motivational-quote::before {
+/* NEW: Style for the actual quote text */
+.quote-text {
+    position: relative; /* Needed for pseudo-elements positioning */
+    padding: 0 25px; /* Add padding to make space for quotes, adjusted */
+    display: inline-block; /* Allows content to wrap but keeps pseudo-elements relative to text */
+    text-align: center; /* Ensure text itself is centered */
+    max-width: 100%; /* Ensure it respects parent width */
+}
+
+/* NEW: Style for the author/attribution */
+.quote-author {
+    font-size: 0.8em; /* Smaller font for author */
+    font-style: normal; /* Override italic from parent */
+    color: #777;
+    margin-top: 10px; /* Space between quote and author */
+    text-align: center;
+}
+
+/* UPDATED: Quotation Marks using pseudo-elements on .quote-text */
+.quote-text::before {
     content: "“"; /* Left quotation mark */
     font-size: 3em; /* Large size for the quote mark */
     color: #ccc; /* Subtle color */
     position: absolute;
-    top: 0;
+    top: 50%; /* Position vertically centered */
     left: 0;
     line-height: 1;
-    transform: translateX(-50%); /* Adjust position */
+    transform: translate(-50%, -50%); /* Adjust position to truly center */
 }
 
-.motivational-quote::after {
+.quote-text::after {
     content: "”"; /* Right quotation mark */
     font-size: 3em; /* Large size for the quote mark */
     color: #ccc; /* Subtle color */
     position: absolute;
-    bottom: 0;
+    top: 50%; /* Position vertically centered */
     right: 0;
     line-height: 1;
-    transform: translateX(50%); /* Adjust position */
+    transform: translate(50%, -50%); /* Adjust position to truly center */
 }
 
 /* Dark Theme Adjustments for Quote Section */
@@ -594,11 +615,14 @@ body.dark-theme .motivational-quote {
     color: #bbb;
 }
 
-body.dark-theme .motivational-quote::before,
-body.dark-theme .motivational-quote::after {
+body.dark-theme .quote-text::before,
+body.dark-theme .quote-text::after {
     color: #666; /* Darker subtle color for dark theme */
 }
 
+body.dark-theme .quote-author {
+    color: #999; /* Adjust author color for dark theme */
+}
 /* Media Queries for Responsiveness */
 
 /* Large screens (1441px and up) - Default behavior */
@@ -748,11 +772,15 @@ body.dark-theme .motivational-quote::after {
 
     .motivational-quote {
         font-size: 1.1em; /* Smaller font on mobile */
-        padding: 0 10px; /* Reduce padding for quotes */
     }
 
-    .motivational-quote::before,
-    .motivational-quote::after {
+    .quote-text {
+        padding: 0 15px; /* Reduce padding for quotes on mobile */
+    }
+
+    .quote-text::before,
+    .quote-text::after {
         font-size: 2.5em; /* Smaller quote marks on mobile */
+        transform: translate(-50%, -50%); /* Keep centered */
     }
 }
