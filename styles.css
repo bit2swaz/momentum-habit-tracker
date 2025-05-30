@@ -535,20 +535,53 @@ body.dark-theme .go-to-top-button:hover {
 /* Motivational Quote Section */
 .quote-section {
     text-align: center;
-    margin-top: 40px; /* Space from the habit tracker grid */
-    padding: 20px;
+    margin-top: 60px; /* Increased space from the main container */
+    margin-bottom: 40px; /* Space before potential footer */
+    padding: 30px; /* Increased padding for better visual space */
     background-color: #f7f7f7;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    
+    /* NEW: For standalone section layout */
+    width: calc(100% - 40px); /* Match body padding */
+    max-width: 900px; /* Set a max-width for the quote section */
+    margin-left: auto; /* Center the block */
+    margin-right: auto; /* Center the block */
+    box-sizing: border-box; /* Include padding in width */
 }
 
 .motivational-quote {
-    font-size: 1.15em;
+    font-size: 1.25em; /* Slightly larger font for prominence */
     font-style: italic;
     color: #555;
     line-height: 1.6;
     margin: 0; /* Remove default paragraph margin */
+    position: relative; /* Needed for pseudo-elements positioning */
+    padding: 0 20px; /* Add padding to make space for quotes */
+}
+
+/* NEW: Quotation Marks using pseudo-elements */
+.motivational-quote::before {
+    content: "“"; /* Left quotation mark */
+    font-size: 3em; /* Large size for the quote mark */
+    color: #ccc; /* Subtle color */
+    position: absolute;
+    top: 0;
+    left: 0;
+    line-height: 1;
+    transform: translateX(-50%); /* Adjust position */
+}
+
+.motivational-quote::after {
+    content: "”"; /* Right quotation mark */
+    font-size: 3em; /* Large size for the quote mark */
+    color: #ccc; /* Subtle color */
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    line-height: 1;
+    transform: translateX(50%); /* Adjust position */
 }
 
 /* Dark Theme Adjustments for Quote Section */
@@ -559,6 +592,11 @@ body.dark-theme .quote-section {
 
 body.dark-theme .motivational-quote {
     color: #bbb;
+}
+
+body.dark-theme .motivational-quote::before,
+body.dark-theme .motivational-quote::after {
+    color: #666; /* Darker subtle color for dark theme */
 }
 
 /* Media Queries for Responsiveness */
@@ -697,5 +735,24 @@ body.dark-theme .motivational-quote {
     .habit-label,
     .date-column {
         font-size: 0.7em; /* Slightly smaller font for very small screens */
+    }
+}
+
+/* Media Query Adjustments for Quote Section */
+@media (max-width: 768px) {
+    .quote-section {
+        margin-top: 40px; /* Adjust margin for smaller screens */
+        padding: 20px; /* Smaller padding */
+        width: calc(100% - 20px); /* Take up more width */
+    }
+
+    .motivational-quote {
+        font-size: 1.1em; /* Smaller font on mobile */
+        padding: 0 10px; /* Reduce padding for quotes */
+    }
+
+    .motivational-quote::before,
+    .motivational-quote::after {
+        font-size: 2.5em; /* Smaller quote marks on mobile */
     }
 }
