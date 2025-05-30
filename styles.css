@@ -25,7 +25,7 @@ body {
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 1000px; /* User's updated value */
     margin: 0 auto;
     background-color: #fff;
     padding: 30px;
@@ -72,13 +72,12 @@ body {
     gap: 10px;
 }
 
-/* UPDATED: tracker-grid min-width - Increased further for date visibility */
 .tracker-grid {
     display: grid;
     grid-template-columns: 1.5fr repeat(7, 1fr);
     border: 1px solid #eee;
     border-radius: 6px;
-    min-width: 960px; /* Increased min-width to ensure all dates fit */
+    min-width: 960px; /* User's updated value */
 }
 
 .grid-header,
@@ -107,10 +106,10 @@ body {
     text-align: center;
     padding: 15px 5px;
     border-right: 1px solid #eee;
-    font-size: 0.8em; /* Keep reduced font size */
-    white-space: nowrap; /* Prevent text from wrapping */
-    overflow: hidden; /* Hide overflow if text is still too long (shouldn't happen now) */
-    text-overflow: ellipsis; /* Add ellipsis if text is hidden (shouldn't happen now) */
+    font-size: 0.8em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .date-column:last-child {
@@ -434,4 +433,69 @@ body.dark-theme .habit-action-icon:hover {
 body.dark-theme .today-column {
     background-color: #01579b;
     color: #e0f2f7;
+}
+
+/* NEW: Styles for Streak Display */
+.streak-container {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Space between fire icon and number */
+    margin-left: 8px; /* Space from habit name text */
+    flex-shrink: 0; /* Prevent it from shrinking */
+    opacity: 0; /* Start invisible for fade-in */
+    transform: scale(0.8); /* Start smaller for zoom effect */
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Smooth transition for initial appearance */
+}
+
+/* Animation for the fire icon */
+@keyframes fire-flicker {
+    0% {
+        opacity: 0.8;
+        transform: scale(1);
+        filter: brightness(100%);
+    }
+    25% {
+        opacity: 1;
+        transform: scale(1.05);
+        filter: brightness(120%);
+    }
+    50% {
+        opacity: 0.9;
+        transform: scale(1);
+        filter: brightness(100%);
+    }
+    75% {
+        opacity: 1;
+        transform: scale(1.03);
+        filter: brightness(110%);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: brightness(100%);
+    }
+}
+
+.streak-container.animate-in {
+    opacity: 1;
+    transform: scale(1);
+    animation: fire-flicker 1.5s ease-out forwards; /* Apply animation */
+    /* forwards: retains the styles from the last keyframe when the animation ends */
+}
+
+
+.streak-icon {
+    color: #ff9800; /* Orange/fire color */
+    font-size: 1.1em; /* Slightly larger for better visibility, adjust if needed */
+    text-shadow: 0 0 5px rgba(255, 152, 0, 0.7), 0 0 10px rgba(255, 152, 0, 0.5); /* Subtle glow */
+}
+
+.streak-number {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #555;
+}
+
+body.dark-theme .streak-number {
+    color: #f0f0f0;
 }

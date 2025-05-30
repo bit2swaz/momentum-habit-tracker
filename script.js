@@ -1,6 +1,6 @@
 let habits = [];
 let currentWeekStart = new Date();
-let mockToday = null; // NEW: Global variable to mock 'today' for testing
+let mockToday = null; // Global variable to mock 'today' for testing
 
 // Helper function to get the current effective 'today'
 function getEffectiveToday() {
@@ -65,7 +65,7 @@ function renderDates() {
     }
 
     const weekStart = new Date(currentWeekStart);
-    const today = getEffectiveToday(); // UPDATED: Use effective today
+    const today = getEffectiveToday(); // Use effective today
 
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
@@ -258,8 +258,9 @@ async function deleteHabit(habitId, habitName) {
 // Calculates the current streak for a given habit.
 function calculateStreak(habit) {
     let streak = 0;
-    const today = getEffectiveToday(); // UPDATED: Use effective today
-    const yesterday = getEffectiveYesterday(); // UPDATED: Use effective yesterday
+    const today = getEffectiveToday(); // Use effective today
+
+    const yesterday = getEffectiveYesterday(); // Use effective yesterday
 
     // Get all completed dates and sort them chronologically
     const sortedDates = Object.keys(habit.completedDates)
@@ -321,8 +322,8 @@ function renderHabits() {
     const currentWeekFormattedDates = [];
     const weekStart = new Date(currentWeekStart);
     
-    const today = getEffectiveToday(); // UPDATED: Use effective today
-    const yesterday = getEffectiveYesterday(); // UPDATED: Use effective yesterday
+    const today = getEffectiveToday(); // Use effective today
+    const yesterday = getEffectiveYesterday(); // Use effective yesterday
 
     for (let i = 0; i < 7; i++) {
         const date = new Date(weekStart);
@@ -358,6 +359,12 @@ function renderHabits() {
             streakContainer.appendChild(streakNumber);
 
             habitNameDiv.appendChild(streakContainer);
+
+            // NEW: Trigger animation class after a short delay to allow DOM render
+            // This ensures the initial opacity/transform from CSS is applied before animation starts
+            setTimeout(() => {
+                streakContainer.classList.add('animate-in');
+            }, 50); // Small delay
         }
 
         const editIcon = document.createElement('i');
@@ -602,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial setup when the DOM is fully loaded.
     loadHabits();
     applyTheme(); // Apply theme on load, now including icon logic
-    currentWeekStart = getMondayOfWeek(getEffectiveToday()); // UPDATED: Use effective today for initial week start
+    currentWeekStart = getMondayOfWeek(getEffectiveToday()); // Use effective today for initial week start
     renderDates();
     renderHabits();
     customEndDateInput.style.display = 'none';
@@ -621,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     currentWeekBtn.addEventListener('click', () => {
-        currentWeekStart = getMondayOfWeek(getEffectiveToday()); // UPDATED: Use effective today for current week
+        currentWeekStart = getMondayOfWeek(getEffectiveToday()); // Use effective today for current week
         renderDates();
         renderHabits();
     });
