@@ -25,7 +25,7 @@ body {
 }
 
 .container {
-    max-width: 900px;
+    max-width: 1000px;
     margin: 0 auto;
     background-color: #fff;
     padding: 30px;
@@ -72,13 +72,13 @@ body {
     gap: 10px;
 }
 
-/* UPDATED: tracker-grid min-width */
+/* UPDATED: tracker-grid min-width - Increased further for date visibility */
 .tracker-grid {
     display: grid;
     grid-template-columns: 1.5fr repeat(7, 1fr);
     border: 1px solid #eee;
     border-radius: 6px;
-    min-width: 800px; /* Increased min-width to provide more space for dates */
+    min-width: 960px; /* Increased min-width to ensure all dates fit */
 }
 
 .grid-header,
@@ -103,15 +103,14 @@ body {
     border-right: 1px solid #eee;
 }
 
-/* UPDATED: date-column font size and white-space */
 .date-column {
     text-align: center;
     padding: 15px 5px;
     border-right: 1px solid #eee;
     font-size: 0.8em; /* Keep reduced font size */
     white-space: nowrap; /* Prevent text from wrapping */
-    overflow: hidden; /* Hide overflow if text is still too long */
-    text-overflow: ellipsis; /* Add ellipsis if text is hidden */
+    overflow: hidden; /* Hide overflow if text is still too long (shouldn't happen now) */
+    text-overflow: ellipsis; /* Add ellipsis if text is hidden (shouldn't happen now) */
 }
 
 .date-column:last-child {
