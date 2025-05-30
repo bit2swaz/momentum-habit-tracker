@@ -47,7 +47,7 @@ A sleek, responsive, and intuitive habit tracking web application, built entirel
 
 ## How to Run Locally
 ```bash
-git clone [https://github.com/bit2swaz/momentum-habit-tracker.git](https://github.com/bit2swaz/momentum-habit-tracker.git)
+git clone https://github.com/bit2swaz/momentum-habit-tracker.git
 cd momentum-habit-tracker
 open index.html
 ```
