@@ -131,17 +131,16 @@ body {
     text-align: left;
     border-right: 1px solid #eee;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
     position: relative;
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis;
 }
 
 .habit-name span {
     flex-grow: 1;
     min-width: 0;
+    word-break: break-word;
 }
 
 .checkbox-cell {
@@ -435,16 +434,16 @@ body.dark-theme .today-column {
     color: #e0f2f7;
 }
 
-/* NEW: Styles for Streak Display */
+/* Styles for Streak Display */
 .streak-container {
     display: flex;
     align-items: center;
-    gap: 4px; /* Space between fire icon and number */
-    margin-left: 8px; /* Space from habit name text */
-    flex-shrink: 0; /* Prevent it from shrinking */
-    opacity: 0; /* Start invisible for fade-in */
-    transform: scale(0.8); /* Start smaller for zoom effect */
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Smooth transition for initial appearance */
+    gap: 4px; 
+    margin-left: 8px;
+    flex-shrink: 0;
+    opacity: 0; 
+    transform: scale(0.8); 
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
 /* Animation for the fire icon */
