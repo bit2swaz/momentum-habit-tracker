@@ -24,8 +24,8 @@
     --success-text: #065F46;
     --error-bg: #FEE2E2;
     --error-text: #991B1B;
-    --streak-color: #FBBF24;
-    --streak-text: #78350F;
+    --streak-color: #FFFBEB; /* Kept for reference */
+    --streak-text: #B45309; /* Kept for reference */
     --overlay-color: rgba(0, 0, 0, 0.4);
 }
 
@@ -54,8 +54,8 @@ body.dark-theme {
     --success-text: #FFFFFF;
     --error-bg: #DC2626;
     --error-text: #FFFFFF;
-    --streak-color: #FCD34D;
-    --streak-text: #1A1A1A;
+    --streak-color: #78350F; /* Kept for reference */
+    --streak-text: #FCD34D; /* Kept for reference */
     --overlay-color: rgba(0, 0, 0, 0.7);
 }
 
@@ -536,18 +536,20 @@ body.dark-theme .today-column {
     transform: scale(1);
     transition: none;
     animation: none;
-    background-color: var(--streak-color);
-    color: var(--streak-text);
+    background-color: transparent;
+    color: var(--foreground);
+    padding: 0;
+    border-radius: 0;
 }
 
 .streak-icon {
     color: inherit;
-    font-size: 1.1em;
-    text-shadow: 0 0 5px rgba(255, 152, 0, 0.7), 0 0 10px rgba(255, 152, 0, 0.5);
+    font-size: 0.9em;
+    text-shadow: none;
 }
 
 .streak-number {
-    font-size: 0.9em;
+    font-size: 0.8em;
     font-weight: bold;
     color: inherit;
 }
