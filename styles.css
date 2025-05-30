@@ -532,6 +532,35 @@ body.dark-theme .go-to-top-button:hover {
     transform: translateY(0);
 }
 
+/* Motivational Quote Section */
+.quote-section {
+    text-align: center;
+    margin-top: 40px; /* Space from the habit tracker grid */
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.motivational-quote {
+    font-size: 1.15em;
+    font-style: italic;
+    color: #555;
+    line-height: 1.6;
+    margin: 0; /* Remove default paragraph margin */
+}
+
+/* Dark Theme Adjustments for Quote Section */
+body.dark-theme .quote-section {
+    background-color: #333;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .motivational-quote {
+    color: #bbb;
+}
+
 /* Media Queries for Responsiveness */
 
 /* Large screens (1441px and up) - Default behavior */
