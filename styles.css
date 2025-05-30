@@ -486,6 +486,52 @@ body.dark-theme .streak-number {
     color: #f0f0f0;
 }
 
+/* Go to Top Button */
+.go-to-top-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px; /* Position on the bottom-left */
+    background-color: #8e24aa; /* Similar to navigation buttons */
+    color: white;
+    border: none;
+    border-radius: 50%; /* Make it circular */
+    width: 50px;
+    height: 50px;
+    font-size: 1.2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    opacity: 0; /* Initially hidden */
+    visibility: hidden; /* Ensure it's not clickable when hidden */
+    transform: translateY(20px); /* Start slightly off-screen */
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background-color 0.2s ease;
+    z-index: 90; /* Below overlay, above other content */
+}
+
+.go-to-top-button:hover {
+    background-color: #4a148c; /* Darker on hover */
+    transform: translateY(0) scale(1.1); /* Subtle lift and scale */
+}
+
+/* Dark Theme Adjustments for Go to Top Button */
+body.dark-theme .go-to-top-button {
+    background-color: #6a1b9a; /* Darker purple for dark theme */
+    box-shadow: 0 2px 10px rgba(255,255,255,0.1);
+}
+
+body.dark-theme .go-to-top-button:hover {
+    background-color: #4a148c;
+}
+
+/* Visibility states handled by JavaScript */
+.go-to-top-button.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
 /* Media Queries for Responsiveness */
 
 /* Large screens (1441px and up) - Default behavior */
