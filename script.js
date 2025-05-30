@@ -443,7 +443,6 @@ function renderHabits() {
         });
         habitList.appendChild(habitRow);
     });
-    // Call the visibility update after habits are rendered
     updateGoToTopButtonVisibility();
 }
 
@@ -495,19 +494,15 @@ function displayRandomQuote() {
 }
 
 let goToTopBtn;
-let habitTrackerDisplayElement; // Reference to the main habit tracker section
+let habitTrackerDisplayElement;
 
 function updateGoToTopButtonVisibility() {
     if (!goToTopBtn || !habitTrackerDisplayElement) {
-        return; // Exit if elements are not found
+        return;
     }
 
-    // The button should only show if there are habits AND the habit tracker section
-    // has scrolled out of view (its top is above the viewport's top).
     const rect = habitTrackerDisplayElement.getBoundingClientRect();
     
-    // We check if the top of the habit tracker display is above the viewport (rect.top < 0)
-    // AND if there's actual content (habits.length > 0) that would necessitate scrolling.
     if (habits.length > 0 && rect.top < 0) {
         goToTopBtn.classList.add('show');
     } else {
@@ -526,24 +521,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggleButton = document.getElementById('themeToggleButton');
     const themeIcon = document.getElementById('themeIcon');
 
-    // Assign global variables on DOMContentLoaded
     goToTopBtn = document.getElementById('goToTopBtn');
     habitTrackerDisplayElement = document.querySelector('.habit-tracker-display');
 
+    // MODIFIED: applyTheme function to include system preference detection
     function applyTheme() {
         const savedTheme = localStorage.getItem('theme');
-        const isBodyDark = document.body.classList.contains('dark-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let themeToApply = savedTheme;
 
-        if (savedTheme === 'dark') {
-            if (!isBodyDark) {
-                document.body.classList.add('dark-theme');
-            }
+        // If no theme is saved in localStorage, use system preference
+        if (themeToApply === null) {
+            themeToApply = prefersDark ? 'dark' : 'light';
+        }
+
+        if (themeToApply === 'dark') {
+            document.body.classList.add('dark-theme');
             themeIcon.classList.remove('fa-sun');
             themeIcon.classList.add('fa-moon');
         } else {
-            if (isBodyDark) {
-                document.body.classList.remove('dark-theme');
-            }
+            document.body.classList.remove('dark-theme');
             themeIcon.classList.remove('fa-moon');
             themeIcon.classList.add('fa-sun');
         }
@@ -629,14 +626,14 @@ document.addEventListener('DOMContentLoaded', () => {
         habitDurationSelect.value = 'forever';
         customEndDateInput.style.display = 'none';
 
-        renderHabits(); // This will now trigger updateGoToTopButtonVisibility
+        renderHabits();
     });
 
     loadHabits();
-    applyTheme();
+    applyTheme(); // Call applyTheme here to set initial theme based on system or saved preference
     currentWeekStart = getMondayOfWeek(getEffectiveToday());
     renderDates();
-    renderHabits(); // Initial render and button visibility check
+    renderHabits();
     customEndDateInput.style.display = 'none';
 
     prevWeekBtn.addEventListener('click', () => {
@@ -657,7 +654,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHabits();
     });
 
-    // Attach the scroll event listener
     window.addEventListener('scroll', updateGoToTopButtonVisibility);
 
     goToTopBtn.addEventListener('click', () => {
@@ -668,8 +664,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     displayRandomQuote();
-
-    // Initial check for button visibility on page load
-    // This is important to set the correct state immediately after the page loads
     updateGoToTopButtonVisibility();
 });
