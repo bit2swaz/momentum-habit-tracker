@@ -435,3 +435,32 @@ body.dark-theme .today-column {
     background-color: #01579b;
     color: #e0f2f7;
 }
+
+/* NEW: Styles for Streak Display */
+.streak-container {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Space between fire icon and number */
+    margin-left: 8px; /* Space from habit name text */
+    flex-shrink: 0; /* Prevent it from shrinking */
+}
+
+.streak-icon {
+    color: #ff9800; /* Orange/fire color */
+    font-size: 1em; /* Same size as habit name text */
+}
+
+.streak-number {
+    font-size: 0.9em; /* Slightly smaller than icon, larger than action icons */
+    font-weight: bold;
+    color: #555; /* Default text color */
+}
+
+/* Dark theme overrides for streak */
+body.dark-theme .streak-number {
+    color: #f0f0f0; /* Lighter text color in dark mode */
+}
+
+.habit-name .habit-action-icon {
+    margin-left: auto;
+}

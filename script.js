@@ -62,12 +62,10 @@ function renderDates() {
         dateColumn.classList.add('date-column');
         dateColumn.dataset.fullDate = formatDate(date);
 
-        // UPDATED: Removed year from options, will append manually
         const options = { weekday: 'short', month: 'short', day: 'numeric' }; 
         const formattedDate = date.toLocaleDateString('en-US', options);
-        const yearTwoDigit = date.getFullYear().toString().slice(-2); // Get last two digits of year
+        const yearTwoDigit = date.getFullYear().toString().slice(-2);
 
-        // Combine formatted date with apostrophe and two-digit year
         dateColumn.textContent = `${formattedDate}, '${yearTwoDigit}`;
 
         if (date.toDateString() === today.toDateString()) {
@@ -240,6 +238,66 @@ async function deleteHabit(habitId, habitName) {
     }
 }
 
+// NEW FUNCTION: Calculates the current streak for a given habit.
+function calculateStreak(habit) {
+    let streak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to start of day
+
+    // Get all completed dates and sort them chronologically
+    const sortedDates = Object.keys(habit.completedDates)
+        .filter(dateString => habit.completedDates[dateString]) // Ensure it's marked true
+        .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+
+    if (sortedDates.length === 0) {
+        return 0; // No completions, no streak
+    }
+
+    let lastDate = null;
+    // Check if today or yesterday was completed to start the streak calculation backwards
+    if (habit.completedDates[formatDate(today)]) {
+        streak = 1;
+        lastDate = today;
+    } else {
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        if (habit.completedDates[formatDate(yesterday)]) {
+            streak = 1;
+            lastDate = yesterday;
+        } else {
+            return 0; // Not completed today or yesterday, streak broken
+        }
+    }
+
+    // Iterate backwards from the last completed day (today or yesterday)
+    for (let i = sortedDates.length - 1; i >= 0; i--) {
+        const currentDate = new Date(sortedDates[i]);
+        currentDate.setHours(0, 0, 0, 0);
+
+        // Skip if the date is today or yesterday (already handled)
+        if (currentDate.toDateString() === today.toDateString() || 
+            (lastDate && currentDate.toDateString() === new Date(lastDate.getTime() - 24 * 60 * 60 * 1000).toDateString())) {
+            continue;
+        }
+
+        const expectedPreviousDay = new Date(lastDate);
+        expectedPreviousDay.setDate(lastDate.getDate() - 1);
+        expectedPreviousDay.setHours(0, 0, 0, 0);
+
+        if (currentDate.toDateString() === expectedPreviousDay.toDateString()) {
+            streak++;
+            lastDate = currentDate;
+        } else if (currentDate < expectedPreviousDay) {
+            // If we find a date that's not consecutive and is older, streak is broken
+            break; 
+        }
+        // If currentDate is greater than expectedPreviousDay, it means there's a gap, so streak is broken
+        // This case is implicitly handled by the 'else if (currentDate < expectedPreviousDay)' or by the loop ending
+    }
+
+    return streak;
+}
+
 
 function renderHabits() {
     const habitList = document.getElementById('habitList');
@@ -268,6 +326,24 @@ function renderHabits() {
         const habitNameText = document.createElement('span');
         habitNameText.textContent = habit.name;
         habitNameDiv.appendChild(habitNameText);
+
+        // NEW: Display Streak Icon and Number
+        const currentStreak = calculateStreak(habit);
+        if (currentStreak >= 3) { // Only show if streak is 3 or more
+            const streakContainer = document.createElement('div');
+            streakContainer.classList.add('streak-container');
+
+            const fireIcon = document.createElement('i');
+            fireIcon.classList.add('fas', 'fa-fire', 'streak-icon');
+            streakContainer.appendChild(fireIcon);
+
+            const streakNumber = document.createElement('span');
+            streakNumber.classList.add('streak-number');
+            streakNumber.textContent = currentStreak;
+            streakContainer.appendChild(streakNumber);
+
+            habitNameDiv.appendChild(streakContainer); // Append streak next to name and icons
+        }
 
         const editIcon = document.createElement('i');
         editIcon.classList.add('fas', 'fa-pencil-alt', 'habit-action-icon', 'edit-icon');
@@ -335,6 +411,7 @@ function renderHabits() {
                             delete targetHabit.completedDates[changedDate];
                         }
                         saveHabits();
+                        renderHabits(); // Re-render to update streak display
                     }
                 });
 
