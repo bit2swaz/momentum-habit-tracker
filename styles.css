@@ -2,17 +2,22 @@
 
 body {
     font-family: sans-serif;
-    margin: 0;
-    padding: 20px;
+    margin: 0; /* Remove default body margin */
+    padding: 0; /* NEW: Remove default body padding */
     background-color: #f4f4f4;
     color: #333;
-    /* Ensure no horizontal scrollbar from body itself */
     overflow-x: hidden;
+
+    /* Flexbox for Sticky Footer */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensures body takes at least full viewport height */
 }
 
 .app-header {
     text-align: center;
     margin-bottom: 40px;
+    padding: 20px; /* Add back padding for header content */
 }
 
 .app-title {
@@ -27,19 +32,21 @@ body {
 }
 
 .container {
-    width: calc(100% - 40px); /* Take up 100% width minus body padding on each side */
-    max-width: 1400px; /* Increased max-width for very large screens to allow more expansion */
-    margin: 0 auto;
+    width: calc(100% - 40px); /* Keep this for content width relative to viewport */
+    max-width: 1400px;
+    margin: 0 auto; /* Centers the container */
     background-color: #fff;
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    box-sizing: border-box; /* Include padding in the width calculation */
+    box-sizing: border-box;
+
+    flex-grow: 1; /* Allows main content to grow and push footer down */
 }
 
 .habit-input-section {
     display: flex;
-    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    flex-wrap: wrap;
     gap: 15px;
     margin-bottom: 30px;
     align-items: center;
@@ -52,8 +59,8 @@ body {
     border: 1px solid #ddd;
     border-radius: 4px;
     flex-grow: 1;
-    min-width: 150px; /* Ensure inputs don't become too small */
-    box-sizing: border-box; /* Include padding in width */
+    min-width: 150px;
+    box-sizing: border-box;
 }
 
 .habit-input-section button {
@@ -65,7 +72,7 @@ body {
     cursor: pointer;
     font-size: 1em;
     transition: background-color 0.2s ease;
-    flex-shrink: 0; /* Prevent button from shrinking too much */
+    flex-shrink: 0;
 }
 
 .habit-input-section button:hover {
@@ -76,30 +83,27 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-wrap: wrap; /* Allow label and select/input to wrap */
-    flex-grow: 1; /* Allow duration controls to take space */
+    flex-wrap: wrap;
+    flex-grow: 1;
 }
 
-/* Wrapper for horizontal scrolling of the tracker grid */
 .habit-tracker-display {
-    overflow-x: hidden; /* Default to hidden on large screens */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    padding-bottom: 10px; /* Add some padding for scrollbar visibility */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
 }
 
 .tracker-grid {
     display: grid;
-    /* Default for very large screens (> 1440px): Flexible columns */
     grid-template-columns: minmax(250px, 2fr) repeat(7, minmax(130px, 1fr)); 
     border: 1px solid #eee;
     border-radius: 6px;
-    /* No min-width here; it will expand with the container */
 }
 
 .grid-header,
 .habit-list,
 .habit-row {
-    display: contents; /* Allows children to be direct grid items */
+    display: contents;
 }
 
 .grid-header {
@@ -116,8 +120,8 @@ body {
     padding: 15px;
     text-align: left;
     border-right: 1px solid #eee;
-    white-space: normal; /* Allow habit label to wrap */
-    word-break: break-word; /* Break long words */
+    white-space: normal;
+    word-break: break-word;
 }
 
 .date-column {
@@ -125,9 +129,9 @@ body {
     padding: 15px 5px;
     border-right: 1px solid #eee;
     font-size: 0.8em;
-    white-space: nowrap; /* Keep date on one line */
-    overflow: hidden; /* Hide overflow if it still happens (less likely now) */
-    text-overflow: ellipsis; /* Show ellipsis if hidden */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .date-column:last-child {
@@ -148,17 +152,17 @@ body {
     padding: 10px 15px;
     text-align: left;
     border-right: 1px solid #eee;
-    display: flex; /* Keep flex for alignment */
-    flex-wrap: wrap; /* Allow content to wrap to next line */
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 8px; /* Space between elements */
+    gap: 8px;
     position: relative;
 }
 
 .habit-name span {
-    flex-grow: 1; /* Allow the text span to grow and take available space */
-    min-width: 0; /* Important for flex items to shrink below their content size */
-    word-break: break-word; /* Ensure long words break if necessary */
+    flex-grow: 1;
+    min-width: 0;
+    word-break: break-word;
 }
 
 .checkbox-cell {
@@ -176,10 +180,10 @@ body {
 .navigation-buttons {
     text-align: center;
     margin-bottom: 20px;
-    display: flex; /* Make buttons flex container */
-    flex-wrap: wrap; /* Allow buttons to wrap */
-    justify-content: center; /* Center buttons */
-    gap: 10px; /* Space between buttons */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
 }
 
 .navigation-buttons button {
@@ -189,9 +193,9 @@ body {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin: 0; /* Remove old margin as gap handles it */
+    margin: 0;
     transition: background-color 0.2s ease;
-    flex-shrink: 0; /* Prevent button from shrinking too much */
+    flex-shrink: 0;
 }
 
 .navigation-buttons button:hover {
@@ -486,52 +490,6 @@ body.dark-theme .streak-number {
     color: #f0f0f0;
 }
 
-/* Go to Top Button */
-.go-to-top-button {
-    position: fixed;
-    bottom: 20px;
-    left: 20px; /* Position on the bottom-left */
-    background-color: #8e24aa; /* Similar to navigation buttons */
-    color: white;
-    border: none;
-    border-radius: 50%; /* Make it circular */
-    width: 50px;
-    height: 50px;
-    font-size: 1.2em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    opacity: 0; /* Initially hidden */
-    visibility: hidden; /* Ensure it's not clickable when hidden */
-    transform: translateY(20px); /* Start slightly off-screen */
-    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background-color 0.2s ease;
-    z-index: 90; /* Below overlay, above other content */
-}
-
-.go-to-top-button:hover {
-    background-color: #4a148c; /* Darker on hover */
-    transform: translateY(0) scale(1.1); /* Subtle lift and scale */
-}
-
-/* Dark Theme Adjustments for Go to Top Button */
-body.dark-theme .go-to-top-button {
-    background-color: #6a1b9a; /* Darker purple for dark theme */
-    box-shadow: 0 2px 10px rgba(255,255,255,0.1);
-}
-
-body.dark-theme .go-to-top-button:hover {
-    background-color: #4a148c;
-}
-
-/* Visibility states handled by JavaScript */
-.go-to-top-button.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
 /* Motivational Quote Section */
 .quote-section {
     text-align: center;
@@ -551,7 +509,6 @@ body.dark-theme .go-to-top-button:hover {
 }
 
 .motivational-quote {
-    /* This paragraph will now contain two spans */
     font-size: 1.25em; /* Slightly larger font for prominence */
     font-style: italic;
     color: #555;
@@ -564,7 +521,6 @@ body.dark-theme .go-to-top-button:hover {
     position: relative; /* For relative positioning of children if needed */
 }
 
-/* NEW: Style for the actual quote text */
 .quote-text {
     position: relative; /* Needed for pseudo-elements positioning */
     padding: 0 25px; /* Add padding to make space for quotes, adjusted */
@@ -573,7 +529,6 @@ body.dark-theme .go-to-top-button:hover {
     max-width: 100%; /* Ensure it respects parent width */
 }
 
-/* NEW: Style for the author/attribution */
 .quote-author {
     font-size: 0.8em; /* Smaller font for author */
     font-style: normal; /* Override italic from parent */
@@ -582,7 +537,6 @@ body.dark-theme .go-to-top-button:hover {
     text-align: center;
 }
 
-/* UPDATED: Quotation Marks using pseudo-elements on .quote-text */
 .quote-text::before {
     content: "“"; /* Left quotation mark */
     font-size: 3em; /* Large size for the quote mark */
@@ -623,6 +577,58 @@ body.dark-theme .quote-text::after {
 body.dark-theme .quote-author {
     color: #999; /* Adjust author color for dark theme */
 }
+
+/* Footer Styles */
+.app-footer {
+    width: 100%; /* Full width */
+    padding: 20px 0; /* Vertical padding */
+    margin-top: 60px; /* Space from the quote section */
+    text-align: center;
+    font-size: 0.9em;
+    color: #888; /* Subtle text color */
+    background-color: #f0f0f0; /* Slightly different background from body */
+    border-top: 1px solid #e0e0e0; /* Subtle top border */
+    box-sizing: border-box;
+    flex-shrink: 0; /* Prevent footer from shrinking */
+}
+
+.app-footer p {
+    margin: 0; /* Remove default paragraph margin */
+}
+
+.app-footer a {
+    color: #6a1b9a; /* Distinct link color, similar to buttons */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s ease, transform 0.2s ease; /* Smooth transitions */
+    display: inline-block; /* Needed for transform to work correctly */
+}
+
+.app-footer a:hover {
+    color: #4a148c; /* Darker on hover */
+    transform: scale(1.1); /* Slightly bigger on hover */
+}
+
+.app-footer a:active {
+    transform: translateY(2px); /* Pressed effect on click */
+}
+
+/* Dark Theme Adjustments for Footer */
+body.dark-theme .app-footer {
+    background-color: #222; /* Darker background for dark theme */
+    border-top-color: #444; /* Darker border */
+    color: #aaa; /* Lighter text color */
+}
+
+body.dark-theme .app-footer a {
+    color: #8e24aa; /* Lighter purple for dark theme link */
+}
+
+body.dark-theme .app-footer a:hover {
+    color: #bb66ee; /* Even lighter on hover */
+}
+
+
 /* Media Queries for Responsiveness */
 
 /* Large screens (1441px and up) - Default behavior */
@@ -684,7 +690,7 @@ body.dark-theme .quote-author {
 /* Tablet screens (up to 768px, including your 768x810 tablet) */
 @media (max-width: 768px) {
     body {
-        padding: 10px; /* Reduce overall padding */
+        padding: 0; /* NEW: Remove body padding for mobile */
     }
 
     .app-title {
@@ -746,6 +752,12 @@ body.dark-theme .quote-author {
     .app-header {
         padding-top: 20px; /* Add space above the title */
     }
+
+    /* NEW: Adjust container and quote section for mobile viewports */
+    .container, .quote-section {
+        width: calc(100% - 20px); /* Adjust for 10px body padding on each side */
+        padding: 15px; /* Smaller padding for mobile */
+    }
 }
 
 /* Mobile screens (up to 480px, including your 425x810 phone) */
@@ -759,28 +771,5 @@ body.dark-theme .quote-author {
     .habit-label,
     .date-column {
         font-size: 0.7em; /* Slightly smaller font for very small screens */
-    }
-}
-
-/* Media Query Adjustments for Quote Section */
-@media (max-width: 768px) {
-    .quote-section {
-        margin-top: 40px; /* Adjust margin for smaller screens */
-        padding: 20px; /* Smaller padding */
-        width: calc(100% - 20px); /* Take up more width */
-    }
-
-    .motivational-quote {
-        font-size: 1.1em; /* Smaller font on mobile */
-    }
-
-    .quote-text {
-        padding: 0 15px; /* Reduce padding for quotes on mobile */
-    }
-
-    .quote-text::before,
-    .quote-text::after {
-        font-size: 2.5em; /* Smaller quote marks on mobile */
-        transform: translate(-50%, -50%); /* Keep centered */
     }
 }
