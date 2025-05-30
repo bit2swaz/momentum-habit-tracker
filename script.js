@@ -1,6 +1,7 @@
 let habits = [];
 let currentWeekStart = new Date();
 
+// Loads habits from localStorage on page load.
 function loadHabits() {
   const storedHabits = localStorage.getItem('habits');
   if (storedHabits) {
@@ -13,10 +14,12 @@ function loadHabits() {
   }
 }
 
+// Saves current habits array to localStorage.
 function saveHabits() {
   localStorage.setItem('habits', JSON.stringify(habits));
 }
 
+// Helper: Formats a Date object into a 'YYYY-MM-DD' string.
 function formatDate(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -24,6 +27,7 @@ function formatDate(date) {
     return `${year}-${month}-${day}`;
 }
 
+// Helper: Returns a new Date object representing the Monday of the given date's week.
 function getMondayOfWeek(date) {
     const d = new Date(date);
     const dayOfWeek = d.getDay();
@@ -33,6 +37,7 @@ function getMondayOfWeek(date) {
     return d;
 }
 
+// Renders the date headers for the current week.
 function renderDates() {
     const gridHeader = document.querySelector('.grid-header');
     
@@ -67,6 +72,7 @@ function renderDates() {
     });
 }
 
+// Displays a temporary congratulations message with an overlay.
 function showCongratulationMessage() {
     let messageContainer = document.getElementById('congratulationsMessage');
     let overlay = document.getElementById('overlay');
@@ -116,26 +122,21 @@ function showCustomMessageBox(message, isConfirmation = false) {
     return new Promise(resolve => {
         const messageBox = document.getElementById('customMessageBox');
         const messageBoxText = document.getElementById('messageBoxText');
-        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
         const overlay = document.getElementById('overlay');
 
-        // IMPORTANT FIX: Clear all existing buttons before adding new ones
-        // This ensures no duplicate buttons accumulate
-        const existingButtons = messageBox.querySelectorAll('button');
-        existingButtons.forEach(btn => btn.removeEventListener('click', btn._handler)); // Remove old listeners
-        messageBox.innerHTML = ''; // Clear all content, then re-add text and buttons
-
-        messageBoxText.textContent = message;
+        // Clear all existing buttons and content before adding new ones
+        messageBox.innerHTML = '';
         messageBox.appendChild(messageBoxText); // Re-add the text element
 
-        const buttonContainer = document.createElement('div'); // Create a container for buttons
-        buttonContainer.classList.add('message-box-buttons'); // Add a class for styling (optional)
+        messageBoxText.textContent = message;
+        
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('message-box-buttons');
 
-        // Re-create the close button to ensure clean state and correct listener
         const closeBtn = document.createElement('button');
-        closeBtn.id = 'messageBoxCloseBtn'; // Keep ID for consistency
+        closeBtn.id = 'messageBoxCloseBtn';
         closeBtn.textContent = isConfirmation ? 'Cancel' : 'OK';
-        closeBtn.classList.add('message-box-button'); // Add a common class for styling
+        closeBtn.classList.add('message-box-button');
         buttonContainer.appendChild(closeBtn);
 
         let confirmBtn;
@@ -147,7 +148,7 @@ function showCustomMessageBox(message, isConfirmation = false) {
             buttonContainer.appendChild(confirmBtn);
         }
 
-        messageBox.appendChild(buttonContainer); // Append the button container
+        messageBox.appendChild(buttonContainer);
 
         overlay.style.opacity = '1';
         overlay.style.visibility = 'visible';
@@ -155,7 +156,6 @@ function showCustomMessageBox(message, isConfirmation = false) {
         
         document.body.classList.add('disable-interactions');
 
-        // Define handlers outside to remove them later
         const closeHandler = () => {
             messageBox.classList.remove('active');
             overlay.style.opacity = '0';
@@ -163,7 +163,7 @@ function showCustomMessageBox(message, isConfirmation = false) {
             document.body.classList.remove('disable-interactions');
             closeBtn.removeEventListener('click', closeHandler);
             if (confirmBtn) confirmBtn.removeEventListener('click', confirmHandler);
-            resolve(false); // Resolve with false if cancelled
+            resolve(false);
         };
 
         const confirmHandler = () => {
@@ -173,17 +173,12 @@ function showCustomMessageBox(message, isConfirmation = false) {
             document.body.classList.remove('disable-interactions');
             closeBtn.removeEventListener('click', closeHandler);
             if (confirmBtn) confirmBtn.removeEventListener('click', confirmHandler);
-            resolve(true); // Resolve with true if confirmed
+            resolve(true);
         };
 
-        // Attach event listeners
         closeBtn.addEventListener('click', closeHandler);
-        // Store handler reference for removal (optional, but good practice for complex cases)
-        closeBtn._handler = closeHandler;
-
         if (isConfirmation) {
             confirmBtn.addEventListener('click', confirmHandler);
-            confirmBtn._handler = confirmHandler; // Store handler reference
         }
     });
 }
@@ -194,14 +189,12 @@ function editHabit(habitId, currentNameDiv) {
     const targetHabit = habits.find(h => h.id === habitId);
     if (!targetHabit) return;
 
-    // Create an input field
     const inputField = document.createElement('input');
     inputField.type = 'text';
     inputField.value = targetHabit.name;
     inputField.classList.add('edit-habit-input');
     inputField.maxLength = 50;
 
-    // Replace the name div's content with the input field
     currentNameDiv.innerHTML = '';
     currentNameDiv.appendChild(inputField);
 
@@ -211,7 +204,7 @@ function editHabit(habitId, currentNameDiv) {
         const newName = inputField.value.trim();
         if (newName === '') {
             showCustomMessageBox('Habit name cannot be empty! Reverting to original name.');
-            targetHabit.name = targetHabit.name; // Revert to original
+            targetHabit.name = targetHabit.name;
             saveHabits();
             renderHabits();
             return;
@@ -270,7 +263,6 @@ function renderHabits() {
         habitNameText.textContent = habit.name;
         habitNameDiv.appendChild(habitNameText);
 
-        // Create Edit Icon
         const editIcon = document.createElement('i');
         editIcon.classList.add('fas', 'fa-pencil-alt', 'habit-action-icon', 'edit-icon');
         editIcon.title = 'Edit Habit';
@@ -279,7 +271,6 @@ function renderHabits() {
         });
         habitNameDiv.appendChild(editIcon);
 
-        // Create Delete Icon
         const deleteIcon = document.createElement('i');
         deleteIcon.classList.add('fas', 'fa-trash-alt', 'habit-action-icon', 'delete-icon');
         deleteIcon.title = 'Delete Habit';
@@ -361,6 +352,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevWeekBtn = document.getElementById('prevWeekBtn');
     const nextWeekBtn = document.getElementById('nextWeekBtn');
     const currentWeekBtn = document.getElementById('currentWeekBtn');
+    const themeToggle = document.getElementById('checkbox');
+    const themeIcon = document.getElementById('themeIcon'); // NEW: Reference to the theme icon
+
+    // Function to apply the saved theme or default to light
+    function applyTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            themeToggle.checked = true; // Set toggle state
+            themeIcon.classList.remove('fa-sun'); // NEW: Change icon to moon
+            themeIcon.classList.add('fa-moon');   // NEW: Change icon to moon
+        } else {
+            document.body.classList.remove('dark-theme');
+            themeToggle.checked = false; // Set toggle state
+            themeIcon.classList.remove('fa-moon'); // NEW: Change icon to sun
+            themeIcon.classList.add('fa-sun');   // NEW: Change icon to sun
+        }
+    }
+
+    // NEW: Event listener for theme toggle
+    themeToggle.addEventListener('change', () => {
+        if (themeToggle.checked) {
+            document.body.classList.add('dark-theme');
+            localStorage.setItem('theme', 'dark');
+            themeIcon.classList.remove('fa-sun'); // NEW: Change icon to moon
+            themeIcon.classList.add('fa-moon');   // NEW: Change icon to moon
+        } else {
+            document.body.classList.remove('dark-theme');
+            localStorage.setItem('theme', 'light');
+            themeIcon.classList.remove('fa-moon'); // NEW: Change icon to sun
+            themeIcon.classList.add('fa-sun');   // NEW: Change icon to sun
+        }
+    });
 
     // Event listener for duration select to show/hide custom date input.
     habitDurationSelect.addEventListener('change', () => {
@@ -431,6 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial setup when the DOM is fully loaded.
     loadHabits();
+    applyTheme(); // Apply theme on load, now including icon logic
     currentWeekStart = getMondayOfWeek(new Date());
     renderDates();
     renderHabits();
