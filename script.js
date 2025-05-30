@@ -1,5 +1,23 @@
 let habits = [];
 let currentWeekStart = new Date();
+let mockToday = null; // NEW: Global variable to mock 'today' for testing
+
+// Helper function to get the current effective 'today'
+function getEffectiveToday() {
+    const d = mockToday ? new Date(mockToday) : new Date();
+    d.setHours(0, 0, 0, 0); // Normalize to start of day
+    return d;
+}
+
+// Helper function to get the effective 'yesterday'
+function getEffectiveYesterday() {
+    const today = getEffectiveToday();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+    return yesterday;
+}
+
 
 // Loads habits from localStorage on page load.
 function loadHabits() {
@@ -47,8 +65,7 @@ function renderDates() {
     }
 
     const weekStart = new Date(currentWeekStart);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getEffectiveToday(); // UPDATED: Use effective today
 
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
@@ -238,61 +255,59 @@ async function deleteHabit(habitId, habitName) {
     }
 }
 
-// NEW FUNCTION: Calculates the current streak for a given habit.
+// Calculates the current streak for a given habit.
 function calculateStreak(habit) {
     let streak = 0;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize to start of day
+    const today = getEffectiveToday(); // UPDATED: Use effective today
+    const yesterday = getEffectiveYesterday(); // UPDATED: Use effective yesterday
 
     // Get all completed dates and sort them chronologically
     const sortedDates = Object.keys(habit.completedDates)
         .filter(dateString => habit.completedDates[dateString]) // Ensure it's marked true
-        .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+        .map(dateString => new Date(dateString)) // Convert to Date objects
+        .sort((a, b) => a.getTime() - b.getTime()); // Sort Date objects
 
     if (sortedDates.length === 0) {
         return 0; // No completions, no streak
     }
 
-    let lastDate = null;
-    // Check if today or yesterday was completed to start the streak calculation backwards
-    if (habit.completedDates[formatDate(today)]) {
-        streak = 1;
-        lastDate = today;
-    } else {
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-        if (habit.completedDates[formatDate(yesterday)]) {
+    let lastCompletedDay = null;
+
+    // Find the most recent completed day that is today or yesterday
+    let startIndex = -1;
+    for (let i = sortedDates.length - 1; i >= 0; i--) {
+        const currentDate = sortedDates[i];
+        if (currentDate.toDateString() === today.toDateString()) {
+            lastCompletedDay = today;
             streak = 1;
-            lastDate = yesterday;
-        } else {
-            return 0; // Not completed today or yesterday, streak broken
+            startIndex = i;
+            break;
+        } else if (currentDate.toDateString() === yesterday.toDateString()) {
+            lastCompletedDay = yesterday;
+            streak = 1;
+            startIndex = i;
+            break;
         }
     }
 
-    // Iterate backwards from the last completed day (today or yesterday)
-    for (let i = sortedDates.length - 1; i >= 0; i--) {
-        const currentDate = new Date(sortedDates[i]);
-        currentDate.setHours(0, 0, 0, 0);
+    if (startIndex === -1) {
+        return 0; // No completion today or yesterday, streak broken
+    }
 
-        // Skip if the date is today or yesterday (already handled)
-        if (currentDate.toDateString() === today.toDateString() || 
-            (lastDate && currentDate.toDateString() === new Date(lastDate.getTime() - 24 * 60 * 60 * 1000).toDateString())) {
-            continue;
-        }
-
-        const expectedPreviousDay = new Date(lastDate);
-        expectedPreviousDay.setDate(lastDate.getDate() - 1);
+    // Iterate backwards from the found starting point
+    for (let i = startIndex - 1; i >= 0; i--) {
+        const currentDate = sortedDates[i];
+        const expectedPreviousDay = new Date(lastCompletedDay);
+        expectedPreviousDay.setDate(lastCompletedDay.getDate() - 1);
         expectedPreviousDay.setHours(0, 0, 0, 0);
 
         if (currentDate.toDateString() === expectedPreviousDay.toDateString()) {
             streak++;
-            lastDate = currentDate;
-        } else if (currentDate < expectedPreviousDay) {
-            // If we find a date that's not consecutive and is older, streak is broken
+            lastCompletedDay = currentDate; // Update lastCompletedDay for next iteration
+        } else {
+            // If the current date is not the expected previous day, the streak is broken
             break; 
         }
-        // If currentDate is greater than expectedPreviousDay, it means there's a gap, so streak is broken
-        // This case is implicitly handled by the 'else if (currentDate < expectedPreviousDay)' or by the loop ending
     }
 
     return streak;
@@ -306,8 +321,8 @@ function renderHabits() {
     const currentWeekFormattedDates = [];
     const weekStart = new Date(currentWeekStart);
     
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getEffectiveToday(); // UPDATED: Use effective today
+    const yesterday = getEffectiveYesterday(); // UPDATED: Use effective yesterday
 
     for (let i = 0; i < 7; i++) {
         const date = new Date(weekStart);
@@ -327,7 +342,7 @@ function renderHabits() {
         habitNameText.textContent = habit.name;
         habitNameDiv.appendChild(habitNameText);
 
-        // NEW: Display Streak Icon and Number
+        // Display Streak Icon and Number
         const currentStreak = calculateStreak(habit);
         if (currentStreak >= 3) { // Only show if streak is 3 or more
             const streakContainer = document.createElement('div');
@@ -342,7 +357,7 @@ function renderHabits() {
             streakNumber.textContent = currentStreak;
             streakContainer.appendChild(streakNumber);
 
-            habitNameDiv.appendChild(streakContainer); // Append streak next to name and icons
+            habitNameDiv.appendChild(streakContainer);
         }
 
         const editIcon = document.createElement('i');
@@ -371,16 +386,30 @@ function renderHabits() {
             cellDate.setHours(0, 0, 0, 0);
 
             let shouldRenderCheckbox = true;
-            if (habit.duration !== 'forever') {
-                const habitStartDate = new Date(habit.duration.startDate);
-                habitStartDate.setHours(0, 0, 0, 0);
-                const habitEndDate = new Date(habit.duration.endDate);
-                habitEndDate.setHours(0, 0, 0, 0);
+            // Determine the effective start date of the habit (creation date or custom start date)
+            const habitCreationTimestamp = parseInt(habit.id); // habit.id is a timestamp string
+            const habitCreationDate = new Date(habitCreationTimestamp);
+            habitCreationDate.setHours(0,0,0,0);
 
-                if (cellDate < habitStartDate || cellDate > habitEndDate) {
-                    shouldRenderCheckbox = false;
-                }
+            const effectiveStartDate = habit.duration.startDate
+                ? new Date(habit.duration.startDate)
+                : habitCreationDate;
+            effectiveStartDate.setHours(0,0,0,0);
+
+            // Also consider the habit's end date if not 'forever'
+            let effectiveEndDate = null;
+            if (habit.duration !== 'forever') {
+                effectiveEndDate = new Date(habit.duration.endDate);
+                effectiveEndDate.setHours(0,0,0,0);
             }
+
+            // Rule 1: Don't render checkbox if outside habit's active duration
+            if (effectiveEndDate && (cellDate < effectiveStartDate || cellDate > effectiveEndDate)) {
+                shouldRenderCheckbox = false;
+            } else if (!effectiveEndDate && cellDate < effectiveStartDate) { // For 'forever' habits before creation
+                shouldRenderCheckbox = false;
+            }
+
 
             if (shouldRenderCheckbox) {
                 const checkbox = document.createElement('input');
@@ -392,23 +421,49 @@ function renderHabits() {
                     checkbox.checked = true;
                 }
 
-                if (cellDate > today) {
+                // NEW STRICT DISABLING LOGIC:
+                let disableCheckbox = true; // Assume disabled by default
+
+                // Rule 2: Enable only for today or yesterday, AND within habit's effective start/end dates
+                if (cellDate.toDateString() === today.toDateString()) {
+                    disableCheckbox = false; // Always enable today's checkbox if within habit duration
+                } else if (cellDate.toDateString() === yesterday.toDateString()) {
+                    // Enable yesterday's checkbox if it's within the habit's active period
+                    if (cellDate >= effectiveStartDate && (!effectiveEndDate || cellDate <= effectiveEndDate)) {
+                        disableCheckbox = false;
+                    }
+                }
+                // All other cases (past before yesterday, future) remain disabled by default `disableCheckbox = true`
+
+                if (disableCheckbox) {
                     checkbox.disabled = true;
-                    checkboxCell.classList.add('disabled-day');
+                    checkboxCell.classList.add('disabled-day'); // Apply visual disabled style
                 }
 
                 checkbox.addEventListener('change', (event) => {
                     const changedHabitId = event.target.dataset.habitId;
                     const changedDate = event.target.dataset.date;
                     const isChecked = event.target.checked;
-
                     const targetHabit = habits.find(h => h.id === changedHabitId);
+                    const cellDateForEvent = new Date(changedDate); // Re-parse date for comparison
+                    cellDateForEvent.setHours(0,0,0,0); // Normalize for comparison
+
+                    // Re-calculate today and yesterday within the event listener context
+                    const currentActualToday = getEffectiveToday(); 
+                    const currentActualYesterday = getEffectiveYesterday();
+
                     if (targetHabit) {
                         if (isChecked) {
                             targetHabit.completedDates[changedDate] = true;
                             showCongratulationMessage();
                         } else {
-                            delete targetHabit.completedDates[changedDate];
+                            // Only allow unchecking if it's TODAY or YESTERDAY.
+                            if (cellDateForEvent.toDateString() === currentActualToday.toDateString() || cellDateForEvent.toDateString() === currentActualYesterday.toDateString()) {
+                                delete targetHabit.completedDates[changedDate];
+                            } else {
+                                event.target.checked = true; // Revert checkbox state if trying to uncheck older past days
+                                showCustomMessageBox("You can only change completion for today's or yesterday's date.");
+                            }
                         }
                         saveHabits();
                         renderHabits(); // Re-render to update streak display
@@ -482,7 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
     habitDurationSelect.addEventListener('change', () => {
         if (habitDurationSelect.value === 'custom') {
             customEndDateInput.style.display = 'inline-block';
-            customEndDateInput.min = formatDate(new Date());
+            customEndDateInput.min = formatDate(getEffectiveToday()); // Use effective today for min date
         } else {
             customEndDateInput.style.display = 'none';
         }
@@ -498,8 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const durationType = habitDurationSelect.value;
         let durationDetails = 'forever';
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today = getEffectiveToday(); // Use effective today for habit creation date
 
         if (durationType === 'custom') {
             const endDate = customEndDateInput.value;
@@ -528,7 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const newHabit = {
-            id: Date.now().toString(),
+            id: Date.now().toString(), // This ID will serve as the creation timestamp
             name: habitName,
             duration: durationDetails,
             completedDates: {},
@@ -548,7 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial setup when the DOM is fully loaded.
     loadHabits();
     applyTheme(); // Apply theme on load, now including icon logic
-    currentWeekStart = getMondayOfWeek(new Date());
+    currentWeekStart = getMondayOfWeek(getEffectiveToday()); // UPDATED: Use effective today for initial week start
     renderDates();
     renderHabits();
     customEndDateInput.style.display = 'none';
@@ -567,7 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     currentWeekBtn.addEventListener('click', () => {
-        currentWeekStart = getMondayOfWeek(new Date());
+        currentWeekStart = getMondayOfWeek(getEffectiveToday()); // UPDATED: Use effective today for current week
         renderDates();
         renderHabits();
     });
